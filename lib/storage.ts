@@ -8,6 +8,7 @@ export interface AppState {
   tutorialCompleted: boolean;
   unlockedLevels: number[];
   currentLevel: number;
+  finalLetterRevealed: boolean;
 }
 
 const STORAGE_KEY = 'diana-bday-state';
@@ -16,6 +17,7 @@ const DEFAULT_STATE: AppState = {
   tutorialCompleted: false,
   unlockedLevels: [],
   currentLevel: -1,
+  finalLetterRevealed: false,
 };
 
 /**
@@ -35,7 +37,17 @@ export function loadState(): AppState {
     
     const parsed = JSON.parse(stored);
     debugLog.info('State loaded from localStorage', parsed);
-    return parsed;
+    // Merge con default per retro-compatibilità (nuovi campi)
+    const merged: AppState = {
+      ...DEFAULT_STATE,
+      ...parsed,
+    };
+    // Sanitizzazione minima
+    merged.unlockedLevels = Array.isArray(merged.unlockedLevels) ? merged.unlockedLevels : [];
+    merged.currentLevel = typeof merged.currentLevel === 'number' ? merged.currentLevel : -1;
+    merged.tutorialCompleted = !!merged.tutorialCompleted;
+    merged.finalLetterRevealed = !!merged.finalLetterRevealed;
+    return merged;
   } catch (error) {
     debugLog.error('Error loading state from localStorage', error);
     return DEFAULT_STATE;
@@ -87,6 +99,18 @@ export function completeTutorial(state: AppState): AppState {
   };
   
   debugLog.info('Tutorial completed');
+  return newState;
+}
+
+/**
+ * Segna la lettera finale come "già rivelata" (per non ripetere l'animazione ai reload)
+ */
+export function setFinalLetterRevealed(state: AppState, revealed: boolean): AppState {
+  const newState = {
+    ...state,
+    finalLetterRevealed: revealed,
+  };
+  debugLog.info('Final letter revealed flag updated', { revealed });
   return newState;
 }
 

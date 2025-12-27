@@ -10,6 +10,7 @@ import { FINAL_LETTER } from '@/lib/content';
 
 interface FinalLetterProps {
   onComplete?: () => void;
+  animate?: boolean;
 }
 
 type FinalStep =
@@ -90,7 +91,7 @@ function buildFinalSteps(content: string): FinalStep[] {
   return steps;
 }
 
-export default function FinalLetter({ onComplete }: FinalLetterProps) {
+export default function FinalLetter({ onComplete, animate = true }: FinalLetterProps) {
   const steps = useMemo(() => buildFinalSteps(FINAL_LETTER.content), []);
   const [visibleCount, setVisibleCount] = useState(1);
   const timersRef = useRef<number[]>([]);
@@ -140,6 +141,13 @@ export default function FinalLetter({ onComplete }: FinalLetterProps) {
     timersRef.current.forEach(id => window.clearTimeout(id));
     timersRef.current = [];
 
+    // Se la lettera è già stata rivelata in passato, mostrala completa senza animazione
+    if (!animate) {
+      debugLog.info('FinalLetter render full (no animation)');
+      setVisibleCount(steps.length);
+      return;
+    }
+
     debugLog.debug('FinalLetter animation (re)start', { steps: steps.length });
 
     // sblocca la prima sezione subito
@@ -182,12 +190,13 @@ export default function FinalLetter({ onComplete }: FinalLetterProps) {
       timersRef.current.forEach(id => window.clearTimeout(id));
       timersRef.current = [];
     };
-  }, [onComplete, steps]);
+  }, [animate, onComplete, steps]);
 
   useEffect(() => {
     // scroll controllato: vai alla sezione appena apparsa, senza tornare in cima
     if (typeof window === 'undefined') return;
     if (visibleCount <= 0) return;
+    if (!animate) return;
 
     const el = document.querySelector(`[data-section="${visibleCount}"]`) as HTMLElement | null;
     if (!el) return;
@@ -195,7 +204,7 @@ export default function FinalLetter({ onComplete }: FinalLetterProps) {
     const rect = el.getBoundingClientRect();
     const targetTop = window.scrollY + rect.top - 96; // offset per header/spazio respiro
     window.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
-  }, [visibleCount]);
+  }, [animate, visibleCount]);
 
   const renderStep = (step: FinalStep, idx: number) => {
     const sectionIndex = idx + 1;

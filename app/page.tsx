@@ -18,6 +18,7 @@ export default function Home() {
     handleCompleteTutorial,
     handleCodeSubmit,
     getUnlockedLetters,
+    markFinalLetterRevealed,
   } = useAppState();
   
   const [showWelcome, setShowWelcome] = useState(true);
@@ -25,6 +26,8 @@ export default function Home() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [latestUnlockedLevel, setLatestUnlockedLevel] = useState<number | undefined>();
   const [showFinalLetter, setShowFinalLetter] = useState(false);
+  const [finalLetterRunId, setFinalLetterRunId] = useState(0);
+  const [forceReplayAnimation, setForceReplayAnimation] = useState(false);
   
   debugLog.debug('Home page rendered', { state, isLoaded });
 
@@ -91,6 +94,8 @@ export default function Home() {
   const handleOpenFinalLetter = () => {
     debugLog.info('Opening final letter');
     setShowFinalLetter(true);
+    // forza remount (utile se si riapre dopo replay)
+    setFinalLetterRunId((v) => v + 1);
     setTimeout(() => {
       const el = document.querySelector('.final-section');
       if (el) {
@@ -99,6 +104,16 @@ export default function Home() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }, 100);
+  };
+
+  const handleReplayFinalLetter = () => {
+    debugLog.info('Replaying final letter animation');
+    setForceReplayAnimation(true);
+    setFinalLetterRunId((v) => v + 1);
+    setTimeout(() => {
+      const el = document.querySelector('.final-section');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
   };
   
   // Loading state
@@ -161,7 +176,26 @@ export default function Home() {
       {/* Final Letter (se aperta) */}
       {showFinalLetter && (
         <div className="final-section">
-          <FinalLetter />
+          {state.finalLetterRevealed && (
+            <div className="final-replay-bar">
+              <button
+                type="button"
+                className="final-replay-button"
+                onClick={handleReplayFinalLetter}
+              >
+                Rigioca animazione
+              </button>
+            </div>
+          )}
+          <FinalLetter
+            key={finalLetterRunId}
+            animate={forceReplayAnimation || !state.finalLetterRevealed}
+            onComplete={() => {
+              // Segna come rivelata solo dopo la prima animazione completata
+              markFinalLetterRevealed();
+              setForceReplayAnimation(false);
+            }}
+          />
         </div>
       )}
       

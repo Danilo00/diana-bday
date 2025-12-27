@@ -11,7 +11,8 @@ import {
   loadState, 
   saveState, 
   unlockLevel, 
-  completeTutorial 
+  completeTutorial,
+  setFinalLetterRevealed,
 } from '@/lib/storage';
 import { validateCode, isCodeUsed } from '@/lib/codes';
 import { getLetterContent } from '@/lib/content';
@@ -21,6 +22,7 @@ export function useAppState() {
     tutorialCompleted: false,
     unlockedLevels: [],
     currentLevel: -1,
+    finalLetterRevealed: false,
   });
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,6 +48,11 @@ export function useAppState() {
   const handleCompleteTutorial = useCallback(() => {
     debugLog.info('Completing tutorial');
     setState((prev) => completeTutorial(prev));
+  }, []);
+
+  const markFinalLetterRevealed = useCallback(() => {
+    debugLog.info('Marking final letter as revealed');
+    setState((prev) => setFinalLetterRevealed(prev, true));
   }, []);
   
   // Valida e sblocca un livello
@@ -92,6 +99,7 @@ export function useAppState() {
     handleCompleteTutorial,
     handleCodeSubmit,
     getUnlockedLetters,
+    markFinalLetterRevealed,
   };
 }
 

@@ -13,11 +13,11 @@ interface FinalLetterProps {
 }
 
 type FinalStep =
-  | { kind: 'text'; text: string; delayAfterMs: number }
-  | { kind: 'image1'; delayAfterMs: number }
-  | { kind: 'image2'; delayAfterMs: number }
-  | { kind: 'image3'; delayAfterMs: number }
-  | { kind: 'ticket'; delayAfterMs: number };
+  | { kind: 'text'; text: string; delayAfterMs: number; pauseBeatsMs?: number[] }
+  | { kind: 'image1'; delayAfterMs: number; pauseBeatsMs?: number[] }
+  | { kind: 'image2'; delayAfterMs: number; pauseBeatsMs?: number[] }
+  | { kind: 'image3'; delayAfterMs: number; pauseBeatsMs?: number[] }
+  | { kind: 'ticket'; delayAfterMs: number; pauseBeatsMs?: number[] };
 
 function buildFinalSteps(content: string): FinalStep[] {
   const parts = content.split(
@@ -31,10 +31,15 @@ function buildFinalSteps(content: string): FinalStep[] {
   // Pausa breve extra (usala liberamente nel contenuto con [PAUSE_BEAT])
   const PAUSE_BEAT = 1500;
 
-  const addDelayToPrev = (ms: number) => {
+  const addDelayToPrev = (ms: number, opts?: { beep?: boolean }) => {
     if (steps.length === 0) return;
     const last = steps[steps.length - 1];
     steps[steps.length - 1] = { ...last, delayAfterMs: last.delayAfterMs + ms } as FinalStep;
+    if (opts?.beep) {
+      const updatedLast = steps[steps.length - 1] as FinalStep;
+      updatedLast.pauseBeatsMs = [...(updatedLast.pauseBeatsMs ?? []), ms];
+      steps[steps.length - 1] = updatedLast;
+    }
   };
 
   for (const raw of parts) {
@@ -42,19 +47,19 @@ function buildFinalSteps(content: string): FinalStep[] {
     if (!part.trim()) continue;
 
     if (part === '[PAUSE]') {
-      addDelayToPrev(PAUSE_SHORT);
+      addDelayToPrev(PAUSE_SHORT, { beep: true });
       continue;
     }
     if (part === '[PAUSE_LONG]') {
-      addDelayToPrev(PAUSE_LONG);
+      addDelayToPrev(PAUSE_LONG, { beep: true });
       continue;
     }
     if (part === '[PAUSE_FINAL]') {
-      addDelayToPrev(PAUSE_FINAL);
+      addDelayToPrev(PAUSE_FINAL, { beep: true });
       continue;
     }
     if (part === '[PAUSE_BEAT]') {
-      addDelayToPrev(PAUSE_BEAT);
+      addDelayToPrev(PAUSE_BEAT, { beep: true });
       continue;
     }
     if (part === '[INDIZI_START]') {
@@ -89,6 +94,41 @@ export default function FinalLetter({ onComplete }: FinalLetterProps) {
   const steps = useMemo(() => buildFinalSteps(FINAL_LETTER.content), []);
   const [visibleCount, setVisibleCount] = useState(1);
   const timersRef = useRef<number[]>([]);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+
+  const playPauseBeep = () => {
+    try {
+      if (typeof window === 'undefined') return;
+      const AudioCtx = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext | undefined;
+      if (!AudioCtx) return;
+
+      if (!audioCtxRef.current) audioCtxRef.current = new AudioCtx();
+      const ctx = audioCtxRef.current;
+
+      if (ctx.state === 'suspended') {
+        ctx.resume().catch(() => {});
+      }
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const now = ctx.currentTime;
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, now);
+
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.12, now + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.09);
+    } catch {
+      // browser may block audio; ignore
+    }
+  };
 
   useEffect(() => {
     debugLog.info('FinalLetter component mounted');
@@ -107,7 +147,26 @@ export default function FinalLetter({ onComplete }: FinalLetterProps) {
 
     let cumulative = 0;
     for (let i = 1; i < steps.length; i++) {
-      cumulative += steps[i - 1].delayAfterMs;
+      const prev = steps[i - 1];
+      cumulative += prev.delayAfterMs;
+
+      // Beep alla fine di OGNI pausa esplicita (PAUSE, LONG, FINAL, BEAT)
+      const beats = prev.pauseBeatsMs ?? [];
+      if (beats.length) {
+        const beatsSum = beats.reduce((a, b) => a + b, 0);
+        const baseDelay = Math.max(0, prev.delayAfterMs - beatsSum);
+        const startTime = cumulative - prev.delayAfterMs;
+        let beatCum = 0;
+        for (const beatMs of beats) {
+          beatCum += beatMs;
+          const tBeep = window.setTimeout(() => {
+            debugLog.debug('Pause ended (beep)', { beatMs, stepIndex: i });
+            playPauseBeep();
+          }, Math.max(0, startTime + baseDelay + beatCum));
+          timersRef.current.push(tBeep);
+        }
+      }
+
       const t = window.setTimeout(() => {
         debugLog.debug('Revealing section', i + 1);
         setVisibleCount(i + 1);

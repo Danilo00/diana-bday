@@ -79,7 +79,12 @@ export default function Home() {
     debugLog.info('Opening final letter');
     setShowFinalLetter(true);
     setTimeout(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const el = document.querySelector('.final-section');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     }, 100);
   };
   
@@ -158,7 +163,7 @@ export default function Home() {
       {canOpenFinalLetter && (
         <div className="final-unlock-section">
           <div className="final-unlock-content">
-            <h2 className="final-unlock-title">🌟 Tutti i pezzi sono al loro posto 🌟</h2>
+            <h2 className="final-unlock-title">Tutti i pezzi sono al loro posto </h2>
             <p className="final-unlock-text">
               Sei pronta per scoprire il regalo?
             </p>

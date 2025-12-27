@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { debugLog } from '@/lib/debug';
 import { FINAL_LETTER } from '@/lib/content';
 
@@ -12,238 +12,244 @@ interface FinalLetterProps {
   onComplete?: () => void;
 }
 
-export default function FinalLetter({ onComplete }: FinalLetterProps) {
-  const [visibleSections, setVisibleSections] = useState<Set<number>>(new Set([0]));
-  const [currentSection, setCurrentSection] = useState(0);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const timeoutsRef = useRef<NodeJS.Timeout[]>([]);
-  
-  debugLog.info('FinalLetter component mounted');
-  
-  useEffect(() => {
-    // Pulisci i timeout quando il componente si smonta
-    return () => {
-      timeoutsRef.current.forEach(timeout => clearTimeout(timeout));
-    };
-  }, []);
-  
-  // Gestisce il reveal progressivo delle sezioni
-  const revealNextSection = (sectionIndex: number) => {
-    const timeout = setTimeout(() => {
-      debugLog.debug('Revealing section', sectionIndex);
-      setVisibleSections(prev => new Set([...prev, sectionIndex]));
-      setCurrentSection(sectionIndex);
-      
-      // Scroll automatico alla nuova sezione
-      setTimeout(() => {
-        const element = document.querySelector(`[data-section="${sectionIndex}"]`);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }, 100);
-    }, 0);
-    
-    timeoutsRef.current.push(timeout);
+type FinalStep =
+  | { kind: 'text'; text: string; delayAfterMs: number }
+  | { kind: 'image1'; delayAfterMs: number }
+  | { kind: 'image2'; delayAfterMs: number }
+  | { kind: 'image3'; delayAfterMs: number }
+  | { kind: 'ticket'; delayAfterMs: number };
+
+function buildFinalSteps(content: string): FinalStep[] {
+  const parts = content.split(
+    /(\[PAUSE\]|\[PAUSE_LONG\]|\[PAUSE_FINAL\]|\[IMAGE_\d+\]|\[TICKET\]|\[INDIZI_START\])/
+  );
+
+  const steps: FinalStep[] = [];
+  const PAUSE_SHORT = 2000;
+  const PAUSE_LONG = 3500;
+  const PAUSE_FINAL = 4000;
+
+  const addDelayToPrev = (ms: number) => {
+    if (steps.length === 0) return;
+    const last = steps[steps.length - 1];
+    steps[steps.length - 1] = { ...last, delayAfterMs: last.delayAfterMs + ms } as FinalStep;
   };
-  
-  // Processa il contenuto con pause e reveal progressivo
-  const renderContent = () => {
-    const parts = FINAL_LETTER.content.split(/(\[PAUSE\]|\[PAUSE_LONG\]|\[PAUSE_FINAL\]|\[IMAGE_\d+\]|\[TICKET\]|\[INDIZI_START\])/);
-    
-    let sectionIndex = 0;
-    let pauseDelay = 0;
-    const PAUSE_SHORT = 2000;
-    const PAUSE_LONG = 3500;
-    const PAUSE_FINAL = 4000;
-    
-    const elements: React.ReactElement[] = [];
-    
-    parts.forEach((part, index) => {
-      if (part.match(/\[PAUSE\]/)) {
-        pauseDelay += PAUSE_SHORT;
-        if (sectionIndex < 20) {
-          setTimeout(() => revealNextSection(sectionIndex + 1), pauseDelay);
+
+  for (const raw of parts) {
+    const part = raw ?? '';
+    if (!part.trim()) continue;
+
+    if (part === '[PAUSE]') {
+      addDelayToPrev(PAUSE_SHORT);
+      continue;
+    }
+    if (part === '[PAUSE_LONG]') {
+      addDelayToPrev(PAUSE_LONG);
+      continue;
+    }
+    if (part === '[PAUSE_FINAL]') {
+      addDelayToPrev(PAUSE_FINAL);
+      continue;
+    }
+    if (part === '[INDIZI_START]') {
+      addDelayToPrev(1000);
+      continue;
+    }
+
+    if (part === '[IMAGE_1]') {
+      steps.push({ kind: 'image1', delayAfterMs: 500 });
+      continue;
+    }
+    if (part === '[IMAGE_2]') {
+      steps.push({ kind: 'image2', delayAfterMs: 500 });
+      continue;
+    }
+    if (part === '[IMAGE_3]') {
+      steps.push({ kind: 'image3', delayAfterMs: 500 });
+      continue;
+    }
+    if (part === '[TICKET]') {
+      steps.push({ kind: 'ticket', delayAfterMs: 0 });
+      continue;
+    }
+
+    steps.push({ kind: 'text', text: part, delayAfterMs: 800 });
+  }
+
+  return steps;
+}
+
+export default function FinalLetter({ onComplete }: FinalLetterProps) {
+  const steps = useMemo(() => buildFinalSteps(FINAL_LETTER.content), []);
+  const [visibleCount, setVisibleCount] = useState(1);
+  const timersRef = useRef<number[]>([]);
+
+  useEffect(() => {
+    debugLog.info('FinalLetter component mounted');
+  }, []);
+
+  useEffect(() => {
+    // Idempotente (compatibile con React StrictMode in dev):
+    // ogni run cancella e rischedula i timer.
+    timersRef.current.forEach(id => window.clearTimeout(id));
+    timersRef.current = [];
+
+    debugLog.debug('FinalLetter animation (re)start', { steps: steps.length });
+
+    // sblocca la prima sezione subito
+    setVisibleCount(steps.length > 0 ? 1 : 0);
+
+    let cumulative = 0;
+    for (let i = 1; i < steps.length; i++) {
+      cumulative += steps[i - 1].delayAfterMs;
+      const t = window.setTimeout(() => {
+        debugLog.debug('Revealing section', i + 1);
+        setVisibleCount(i + 1);
+        if (i + 1 === steps.length) {
+          debugLog.info('FinalLetter animation completed');
+          onComplete?.();
         }
-        return;
-      }
-      
-      if (part.match(/\[PAUSE_LONG\]/)) {
-        pauseDelay += PAUSE_LONG;
-        if (sectionIndex < 20) {
-          setTimeout(() => revealNextSection(sectionIndex + 1), pauseDelay);
-        }
-        return;
-      }
-      
-      if (part.match(/\[PAUSE_FINAL\]/)) {
-        pauseDelay += PAUSE_FINAL;
-        if (sectionIndex < 20) {
-          setTimeout(() => revealNextSection(sectionIndex + 1), pauseDelay);
-        }
-        return;
-      }
-      
-      if (part.match(/\[INDIZI_START\]/)) {
-        pauseDelay += 1000;
-        if (sectionIndex < 20) {
-          setTimeout(() => revealNextSection(sectionIndex + 1), pauseDelay);
-        }
-        return;
-      }
-      
-      if (part.match(/\[IMAGE_1\]/)) {
-        sectionIndex++;
-        const currentIdx = sectionIndex;
-        elements.push(
-          <div 
-            key={`section-${currentIdx}`}
-            data-section={currentIdx}
-            className={`reveal-section ${visibleSections.has(currentIdx) ? 'visible' : 'hidden'}`}
-          >
-            <div className="image-reveal">
-              <div className="image-placeholder image-1">
-                <p className="image-caption">✈️ Indizio 1: L'Aereo</p>
-                <div className="image-box">
-                  <div className="image-placeholder-content">
-                    [Inserisci qui l'immagine del gioco delle differenze con l'aereo]
-                  </div>
+      }, cumulative);
+      timersRef.current.push(t);
+    }
+
+    return () => {
+      timersRef.current.forEach(id => window.clearTimeout(id));
+      timersRef.current = [];
+    };
+  }, [onComplete, steps]);
+
+  useEffect(() => {
+    // scroll controllato: vai alla sezione appena apparsa, senza tornare in cima
+    if (typeof window === 'undefined') return;
+    if (visibleCount <= 0) return;
+
+    const el = document.querySelector(`[data-section="${visibleCount}"]`) as HTMLElement | null;
+    if (!el) return;
+
+    const rect = el.getBoundingClientRect();
+    const targetTop = window.scrollY + rect.top - 96; // offset per header/spazio respiro
+    window.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+  }, [visibleCount]);
+
+  const renderStep = (step: FinalStep, idx: number) => {
+    const sectionIndex = idx + 1;
+    const isVisible = sectionIndex <= visibleCount;
+
+    if (step.kind === 'text') {
+      return (
+        <div
+          key={`section-${sectionIndex}`}
+          data-section={sectionIndex}
+          className={`reveal-section text-section ${isVisible ? 'visible' : 'hidden'}`}
+        >
+          {step.text.split('\n').map((line, lineIndex) =>
+            line.trim() ? (
+              <p key={`${sectionIndex}-${lineIndex}`} className="final-text">
+                {line}
+              </p>
+            ) : (
+              <br key={`${sectionIndex}-${lineIndex}`} />
+            )
+          )}
+        </div>
+      );
+    }
+
+    if (step.kind === 'image1') {
+      return (
+        <div
+          key={`section-${sectionIndex}`}
+          data-section={sectionIndex}
+          className={`reveal-section ${isVisible ? 'visible' : 'hidden'}`}
+        >
+          <div className="image-reveal">
+            <div className="image-placeholder image-1">
+              <p className="image-caption">✈️ Indizio 1: L'Aereo</p>
+              <div className="image-box">
+                <div className="image-placeholder-content">
+                  [Inserisci qui l'immagine del gioco delle differenze con l'aereo]
                 </div>
               </div>
             </div>
           </div>
-        );
-        pauseDelay += 500;
-        if (currentIdx < 20) {
-          setTimeout(() => revealNextSection(currentIdx + 1), pauseDelay);
-        }
-        return;
-      }
-      
-      if (part.match(/\[IMAGE_2\]/)) {
-        sectionIndex++;
-        const currentIdx = sectionIndex;
-        elements.push(
-          <div 
-            key={`section-${currentIdx}`}
-            data-section={currentIdx}
-            className={`reveal-section ${visibleSections.has(currentIdx) ? 'visible' : 'hidden'}`}
-          >
-            <div className="image-reveal">
-              <div className="image-placeholder image-2">
-                <p className="image-caption">🌸 Indizio 2: Il Fiore</p>
-                <div className="image-box">
-                  <div className="image-placeholder-content">
-                    [Inserisci qui l'immagine del fiore di ciliegio]
-                  </div>
+        </div>
+      );
+    }
+
+    if (step.kind === 'image2') {
+      return (
+        <div
+          key={`section-${sectionIndex}`}
+          data-section={sectionIndex}
+          className={`reveal-section ${isVisible ? 'visible' : 'hidden'}`}
+        >
+          <div className="image-reveal">
+            <div className="image-placeholder image-2">
+              <p className="image-caption">🌸 Indizio 2: Il Fiore</p>
+              <div className="image-box">
+                <div className="image-placeholder-content">[Inserisci qui l'immagine del fiore di ciliegio]</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (step.kind === 'image3') {
+      return (
+        <div
+          key={`section-${sectionIndex}`}
+          data-section={sectionIndex}
+          className={`reveal-section ${isVisible ? 'visible' : 'hidden'}`}
+        >
+          <div className="image-reveal">
+            <div className="image-placeholder image-3">
+              <p className="image-caption">🔴 Indizio 3: La Bandiera</p>
+              <div className="image-box">
+                <div className="image-placeholder-content">
+                  [Inserisci qui l'immagine della pallina rossa/bandiera giapponese]
                 </div>
               </div>
             </div>
           </div>
-        );
-        pauseDelay += 500;
-        if (currentIdx < 20) {
-          setTimeout(() => revealNextSection(currentIdx + 1), pauseDelay);
-        }
-        return;
-      }
-      
-      if (part.match(/\[IMAGE_3\]/)) {
-        sectionIndex++;
-        const currentIdx = sectionIndex;
-        elements.push(
-          <div 
-            key={`section-${currentIdx}`}
-            data-section={currentIdx}
-            className={`reveal-section ${visibleSections.has(currentIdx) ? 'visible' : 'hidden'}`}
-          >
-            <div className="image-reveal">
-              <div className="image-placeholder image-3">
-                <p className="image-caption">🔴 Indizio 3: La Bandiera</p>
-                <div className="image-box">
-                  <div className="image-placeholder-content">
-                    [Inserisci qui l'immagine della pallina rossa/bandiera giapponese]
-                  </div>
-                </div>
+        </div>
+      );
+    }
+
+    // ticket
+    return (
+      <div
+        key={`section-${sectionIndex}`}
+        data-section={sectionIndex}
+        className={`reveal-section ${isVisible ? 'visible' : 'hidden'}`}
+      >
+        <div className="ticket-reveal-container">
+          <div className="ticket-container">
+            <div className="ticket-shine" />
+            <h2 className="ticket-title">✈️ Il Tuo Regalo ✈️</h2>
+            <div className="ticket-content">
+              <div className="ticket-destination">
+                <span className="destination-label">Destinazione</span>
+                <span className="destination-name">GIAPPONE 🇯🇵</span>
+              </div>
+              <div className="ticket-info">
+                <p>✈️ Volo Andata e Ritorno</p>
+                <p>🏨 Hotel Prenotato</p>
+                <p>🌸 Primavera - Stagione dei Ciliegi in Fiore</p>
+              </div>
+              <div className="ticket-date">
+                <p className="date-label">Preparati a partire</p>
+                <p className="date-value">Primavera 2025</p>
               </div>
             </div>
-          </div>
-        );
-        pauseDelay += 500;
-        if (currentIdx < 20) {
-          setTimeout(() => revealNextSection(currentIdx + 1), pauseDelay);
-        }
-        return;
-      }
-      
-      if (part.match(/\[TICKET\]/)) {
-        sectionIndex++;
-        const currentIdx = sectionIndex;
-        elements.push(
-          <div 
-            key={`section-${currentIdx}`}
-            data-section={currentIdx}
-            className={`reveal-section ${visibleSections.has(currentIdx) ? 'visible' : 'hidden'}`}
-          >
-            <div className="ticket-reveal-container">
-              <div className="ticket-container">
-                <div className="ticket-shine" />
-                <h2 className="ticket-title">✈️ Il Tuo Regalo ✈️</h2>
-                <div className="ticket-content">
-                  <div className="ticket-destination">
-                    <span className="destination-label">Destinazione</span>
-                    <span className="destination-name">GIAPPONE 🇯🇵</span>
-                  </div>
-                  <div className="ticket-info">
-                    <p>✈️ Volo Andata e Ritorno</p>
-                    <p>🏨 Hotel Prenotato</p>
-                    <p>🌸 Primavera - Stagione dei Ciliegi in Fiore</p>
-                  </div>
-                  <div className="ticket-date">
-                    <p className="date-label">Preparati a partire</p>
-                    <p className="date-value">Primavera 2025</p>
-                  </div>
-                </div>
-                <div className="ticket-footer">
-                  <p>Il viaggio che abbiamo sempre sognato 🌸✨</p>
-                </div>
-              </div>
+            <div className="ticket-footer">
+              <p>Il viaggio che abbiamo sempre sognato 🌸✨</p>
             </div>
           </div>
-        );
-        return;
-      }
-      
-      // Testo normale
-      if (part.trim()) {
-        sectionIndex++;
-        const currentIdx = sectionIndex;
-        elements.push(
-          <div 
-            key={`section-${currentIdx}`}
-            data-section={currentIdx}
-            className={`reveal-section text-section ${visibleSections.has(currentIdx) ? 'visible' : 'hidden'}`}
-          >
-            {part.split('\n').map((line, lineIndex) => (
-              line.trim() ? (
-                <p key={`${currentIdx}-${lineIndex}`} className="final-text">
-                  {line}
-                </p>
-              ) : (
-                <br key={`${currentIdx}-${lineIndex}`} />
-              )
-            ))}
-          </div>
-        );
-        
-        // Auto-reveal dopo un breve delay per il testo
-        pauseDelay += 800;
-        if (currentIdx < 20 && !part.includes('[')) {
-          setTimeout(() => revealNextSection(currentIdx + 1), pauseDelay);
-        }
-      }
-    });
-    
-    return elements;
+        </div>
+      </div>
+    );
   };
   
   return (
@@ -253,11 +259,11 @@ export default function FinalLetter({ onComplete }: FinalLetterProps) {
         <div className="sparkles">✨💝✨</div>
       </div>
       
-      <div className="final-letter-content" ref={contentRef}>
-        {renderContent()}
+      <div className="final-letter-content">
+        {steps.map((s, idx) => renderStep(s, idx))}
       </div>
       
-      <div className={`final-footer ${visibleSections.size > 15 ? 'visible' : 'hidden'}`}>
+      <div className={`final-footer ${visibleCount >= steps.length ? 'visible' : 'hidden'}`}>
         <p className="completion-message">
           🎉 Hai completato il viaggio! 🎉
         </p>

@@ -98,8 +98,11 @@ export default function FinalLetter({ onComplete, animate = true }: FinalLetterP
   const audioCtxRef = useRef<AudioContext | null>(null);
   const [soundsEnabled, setSoundsEnabled] = useState(false);
   const [soundsSupported, setSoundsSupported] = useState(true);
+  const [hapticsEnabled, setHapticsEnabled] = useState(false);
+  const [hapticsSupported, setHapticsSupported] = useState(true);
 
   const SOUNDS_STORAGE_KEY = 'diana-bday-sounds-enabled';
+  const HAPTICS_STORAGE_KEY = 'diana-bday-haptics-enabled';
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -111,6 +114,35 @@ export default function FinalLetter({ onComplete, animate = true }: FinalLetterP
     const stored = window.localStorage.getItem(SOUNDS_STORAGE_KEY);
     if (stored === 'true') setSoundsEnabled(true);
   }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const supported = typeof navigator !== 'undefined' && typeof (navigator as any).vibrate === 'function';
+    if (!supported) {
+      setHapticsSupported(false);
+      return;
+    }
+    const stored = window.localStorage.getItem(HAPTICS_STORAGE_KEY);
+    if (stored === 'true') setHapticsEnabled(true);
+  }, []);
+
+  const vibrateBeat = (beatMs: number) => {
+    try {
+      if (typeof window === 'undefined') return;
+      if (!hapticsEnabled) return;
+      if (typeof navigator === 'undefined') return;
+      const vibrate = (navigator as any).vibrate as ((pattern: number | number[]) => boolean) | undefined;
+      if (!vibrate) return;
+
+      // pattern leggero: breve per beat, più deciso per pause lunghe
+      if (beatMs >= 9000) vibrate([45, 60, 45]);
+      else if (beatMs >= 6000) vibrate([35, 50, 35]);
+      else if (beatMs >= 2000) vibrate(30);
+      else vibrate(18);
+    } catch {
+      // ignore
+    }
+  };
 
   const playPauseBeep = () => {
     try {
@@ -147,40 +179,51 @@ export default function FinalLetter({ onComplete, animate = true }: FinalLetterP
     }
   };
 
-  const handleEnableSounds = () => {
+  const handleEnableFeedback = () => {
     try {
       if (typeof window === 'undefined') return;
       const AudioCtx = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext | undefined;
       if (!AudioCtx) {
         setSoundsSupported(false);
-        return;
+        // anche se audio non supportato, possiamo provare ad abilitare vibrazione
       }
 
-      if (!audioCtxRef.current) audioCtxRef.current = new AudioCtx();
-      const ctx = audioCtxRef.current;
-
-      // user gesture: prova a sbloccare
-      if (ctx.state === 'suspended') {
-        ctx.resume().catch(() => {});
+      if (AudioCtx) {
+        if (!audioCtxRef.current) audioCtxRef.current = new AudioCtx();
+        const ctx = audioCtxRef.current;
+        // user gesture: prova a sbloccare
+        if (ctx.state === 'suspended') {
+          ctx.resume().catch(() => {});
+        }
+        window.localStorage.setItem(SOUNDS_STORAGE_KEY, 'true');
+        setSoundsEnabled(true);
       }
 
-      window.localStorage.setItem(SOUNDS_STORAGE_KEY, 'true');
-      setSoundsEnabled(true);
+      const vibSupported = typeof navigator !== 'undefined' && typeof (navigator as any).vibrate === 'function';
+      if (!vibSupported) {
+        setHapticsSupported(false);
+      } else {
+        window.localStorage.setItem(HAPTICS_STORAGE_KEY, 'true');
+        setHapticsEnabled(true);
+      }
 
-      // beep di test
+      // test (beep + vibrazione)
       setTimeout(() => {
         playPauseBeep();
+        vibrateBeat(2000);
       }, 50);
     } catch {
       // ignore
     }
   };
 
-  const handleDisableSounds = () => {
+  const handleDisableFeedback = () => {
     try {
       if (typeof window === 'undefined') return;
       window.localStorage.setItem(SOUNDS_STORAGE_KEY, 'false');
       setSoundsEnabled(false);
+      window.localStorage.setItem(HAPTICS_STORAGE_KEY, 'false');
+      setHapticsEnabled(false);
     } catch {
       // ignore
     }
@@ -225,6 +268,7 @@ export default function FinalLetter({ onComplete, animate = true }: FinalLetterP
           const tBeep = window.setTimeout(() => {
             debugLog.debug('Pause ended (beep)', { beatMs, stepIndex: i });
             playPauseBeep();
+            vibrateBeat(beatMs);
           }, Math.max(0, startTime + baseDelay + beatCum));
           timersRef.current.push(tBeep);
         }
@@ -389,7 +433,7 @@ export default function FinalLetter({ onComplete, animate = true }: FinalLetterP
           <div className="ticket-container">
             <div className="ticket-shine" />
             <h2 className="ticket-title">✈️ Il Tuo Regalo</h2>
-            <p className="ticket-subtitle">Aprilo. Guardalo bene. È reale.</p>
+            <p className="ticket-subtitle">Guardalo bene. È reale.</p>
             <div className="ticket-content">
               <div className="ticket-image-wrap">
                 <img
@@ -422,15 +466,15 @@ export default function FinalLetter({ onComplete, animate = true }: FinalLetterP
       <div className="final-letter-header">
         <h1 className="final-title">{FINAL_LETTER.title}</h1>
         <div className="sparkles">✨💝✨</div>
-        {soundsSupported && (
+        {(soundsSupported || hapticsSupported) && (
           <div className="final-sounds-bar">
-            {!soundsEnabled ? (
-              <button type="button" className="final-sounds-btn" onClick={handleEnableSounds}>
-                🔊 Abilita suoni
+            {!(soundsEnabled || hapticsEnabled) ? (
+              <button type="button" className="final-sounds-btn" onClick={handleEnableFeedback}>
+                🔊📳 Abilita suoni e vibrazione
               </button>
             ) : (
-              <button type="button" className="final-sounds-btn" onClick={handleDisableSounds}>
-                🔇 Disattiva suoni
+              <button type="button" className="final-sounds-btn" onClick={handleDisableFeedback}>
+                🔇📳 Disattiva
               </button>
             )}
           </div>

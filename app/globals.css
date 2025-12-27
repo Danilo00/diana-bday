@@ -985,6 +985,41 @@ body {
   font-size: 0.85rem;
 }
 
+/* Floating button: scroll to bottom */
+.scroll-bottom-fab {
+  position: fixed;
+  right: 16px;
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(15, 15, 18, 0.75);
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1200;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+  backdrop-filter: blur(10px);
+  transition: transform 0.15s ease, opacity 0.2s ease;
+}
+
+.scroll-bottom-fab:hover {
+  transform: translateY(-2px);
+}
+
+.scroll-bottom-fab.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.scroll-bottom-fab.visible {
+  opacity: 1;
+}
+
 /* Final Unlock Section */
 .final-unlock-section {
   margin: 3rem 0;

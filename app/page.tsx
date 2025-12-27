@@ -8,6 +8,7 @@ import Tutorial from '@/components/Tutorial';
 import CodeInput from '@/components/CodeInput';
 import LettersHistory from '@/components/LettersHistory';
 import FinalLetter from '@/components/FinalLetter';
+import ScrollToBottomFab from '@/components/ScrollToBottomFab';
 
 export default function Home() {
   const {
@@ -110,12 +111,8 @@ export default function Home() {
   // Main app
   const unlockedLetters = getUnlockedLetters();
   const canOpenFinalLetter = state.currentLevel >= 3 && !showFinalLetter;
-  const totalSteps = 5; // Tutorial + 3 messaggi + Rivelazione finale
-  const currentStep = showFinalLetter
-    ? totalSteps
-    : state.currentLevel >= 0
-      ? state.currentLevel + 1
-      : 1;
+  const totalPieces = 3; // tutorial non conta
+  const currentPieces = Math.min(Math.max(state.currentLevel, 0), totalPieces); // 0..3 (tutorial=0)
   
   return (
     <main className="main-container">
@@ -144,7 +141,7 @@ export default function Home() {
       <header className="app-header">
         <h1 className="app-title">🎁 Lettere per Diana 🎁</h1>
         <p className="app-subtitle">
-          Livello {currentStep} di {totalSteps}
+          Livello {currentPieces} di {totalPieces}
         </p>
       </header>
       
@@ -209,6 +206,8 @@ export default function Home() {
           </button>
         )}
       </footer>
+
+      <ScrollToBottomFab />
     </main>
   );
 }

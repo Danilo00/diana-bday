@@ -10,16 +10,16 @@ File: `lib/codes.ts`
 
 **Cambia i codici prima di usare l'app!** Attualmente sono:
 - `A7Q9-M2KD` - Tutorial
-- `R4T8-LX91` - Lettera 1
+- `R4T8-LX91` - Lettera 1  
 - `C3M7-PA62` - Lettera 2
-- `Z9K2-WE84` - Lettera 3
-- `J8F5-NR30` - Lettera finale
+- `J8F5-NR30` - Lettera finale (dopo aver completato livello 2)
 
 ```typescript
 export const CODES: CodeMapping[] = [
   { code: 'TUOCODICE1', level: 0, type: 'tutorial' },
   { code: 'TUOCODICE2', level: 1, type: 'letter' },
-  // ... modifica tutti i codici
+  { code: 'TUOCODICE3', level: 2, type: 'letter' },
+  { code: 'TUOCODICE4', level: 3, type: 'final' },
 ];
 ```
 
@@ -128,12 +128,12 @@ Per iniziare, visita:
 https://[tuo-dominio].vercel.app
 
 E inserisci questo codice:
-[CODICE TUTORIAL]
+A7Q9-M2KD
 
 Buon divertimento!
 ```
 
-**Lettere 2-5:**
+**Lettere 2-3:**
 ```
 Scatola [N] 🎁
 
@@ -142,6 +142,8 @@ Il tuo prossimo codice è:
 
 Inseriscilo nell'app per continuare...
 ```
+
+**Nota**: Dopo il livello 2, apparirà un pulsante per aprire la lettera finale. Non serve un codice fisico per questo!
 
 ## 🐛 Debug
 

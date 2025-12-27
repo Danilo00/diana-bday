@@ -46,7 +46,7 @@ export default function Tutorial({ onComplete }: TutorialProps) {
             <span className="step-number">2</span>
             <div className="step-content">
               <h3>Inserisci il codice qui</h3>
-              <p>Il codice sblocca un contenuto digitale</p>
+              <p>Il codice sblocca un messaggio nascosto</p>
             </div>
           </div>
           
@@ -62,14 +62,14 @@ export default function Tutorial({ onComplete }: TutorialProps) {
             <span className="step-number">4</span>
             <div className="step-content">
               <h3>Continua fino alla fine</h3>
-              <p>Il senso completo si rivelerà nell'ultimo messaggio</p>
+              <p>Il regalo si rivelerà nell'ultima lettera</p>
             </div>
           </div>
         </div>
         
         <div className="tutorial-practice">
           <h3>Prova Subito!</h3>
-          <p>Cerca il codice nella prima lettera fisica e inseriscilo qui:</p>
+          <p>Nella prima lettera hai ricevuto un codice di esempio, inseriscilo qui:</p>
           
           <form onSubmit={handleSubmit} className="tutorial-form">
             <input
@@ -99,7 +99,8 @@ export default function Tutorial({ onComplete }: TutorialProps) {
           {showHint && (
             <div className="hint-box">
               <p>💡 Il primo codice dovrebbe essere scritto sulla lettera fisica che hai trovato nella prima scatola.</p>
-              <p>Cerca qualcosa tipo: <code>A7Q9-M2KD</code></p>
+              <p>Cerca qualcosa tipo: </p>
+              <code>A7Q9-M2KD</code>
             </div>
           )}
         </div>

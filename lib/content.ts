@@ -12,22 +12,12 @@ export interface LetterContent {
 export const LETTERS: LetterContent[] = [
   {
     level: 0,
-    title: 'Benvenuta.',
-    content: `Questa applicazione serve a leggere il tuo regalo,
-ma non tutto insieme.
+    title: 'Benvenuta',
+    content: `Hai inserito il codice di esempio. Ora sai come funziona l’app: facile, vero?
 
-Ogni volta che completerai un livello del gioco fisico,
-riceverai un codice.
-
-Inserendo il codice qui, sbloccherai una nuova parte del messaggio.
-
-Alcuni contenuti, da soli, non avranno molto senso.
-È normale.
-
-Il significato completo arriverà solo alla fine.
-
-Quando troverai un nuovo codice, inseriscilo qui sotto.`,
-    date: 'Tutorial'
+Apri la prima scatola.
+Ti aspetta il primo mini-gioco: trova gli intrusi!`,
+    date: 'Tutorial',
   },
   {
     level: 1,
@@ -48,21 +38,17 @@ Continua a giocare.`,
 
 Alcune cose funzionano solo
 quando smetti di cercare risposte
-e continui ad andare avanti.`,
-    date: 'Livello 2'
-  },
-  {
-    level: 3,
-    title: 'Ultimo Pezzo',
-    content: `Hai finalmente sbloccato l'ultimo pezzo del puzzle.
+e continui ad andare avanti.
 
-Ora puoi leggere la lettera finale.`,
-    date: 'Livello 3'
+Hai sbloccato tutti i pezzi del puzzle.
+
+Ora sei pronta per la rivelazione finale.`,
+    date: 'Livello 2'
   },
 ];
 
 export const FINAL_LETTER = {
-  level: 4,
+  level: 3,
   title: 'La Lettera',
   content: `Ora puoi fermarti.
 

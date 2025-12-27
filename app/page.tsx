@@ -24,6 +24,7 @@ export default function Home() {
   const [showTutorial, setShowTutorial] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [latestUnlockedLevel, setLatestUnlockedLevel] = useState<number | undefined>();
+  const [showFinalLetter, setShowFinalLetter] = useState(false);
   
   debugLog.debug('Home page rendered', { state, isLoaded });
   
@@ -74,6 +75,14 @@ export default function Home() {
     }
   };
   
+  const handleOpenFinalLetter = () => {
+    debugLog.info('Opening final letter');
+    setShowFinalLetter(true);
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
+  };
+  
   // Loading state
   if (!isLoaded) {
     return (
@@ -97,6 +106,7 @@ export default function Home() {
   // Main app
   const unlockedLetters = getUnlockedLetters();
   const finalUnlocked = isFinalLetterUnlocked();
+  const canOpenFinalLetter = state.currentLevel >= 2 && !showFinalLetter;
   
   return (
     <main className="main-container">
@@ -125,27 +135,45 @@ export default function Home() {
       <header className="app-header">
         <h1 className="app-title">🎁 Lettere per Diana 🎁</h1>
         <p className="app-subtitle">
-          Livello {state.currentLevel >= 0 ? state.currentLevel + 1 : 1} di 5
+          Livello {state.currentLevel >= 0 ? state.currentLevel + 1 : 1} di 4
         </p>
       </header>
       
-      {/* Final Letter (se sbloccata) */}
-      {finalUnlocked && (
+      {/* Final Letter (se aperta) */}
+      {showFinalLetter && (
         <div className="final-section">
           <FinalLetter />
         </div>
       )}
       
       {/* Letters History */}
-      {unlockedLetters.length > 0 && !finalUnlocked && (
+      {unlockedLetters.length > 0 && !showFinalLetter && (
         <LettersHistory 
           letters={unlockedLetters} 
           latestLevel={latestUnlockedLevel}
         />
       )}
       
-      {/* Code Input (solo se non è stata sbloccata la lettera finale) */}
-      {!finalUnlocked && (
+      {/* Pulsante per aprire lettera finale (quando sbloccato livello 2) */}
+      {canOpenFinalLetter && (
+        <div className="final-unlock-section">
+          <div className="final-unlock-content">
+            <h2 className="final-unlock-title">🌟 Tutti i pezzi sono al loro posto 🌟</h2>
+            <p className="final-unlock-text">
+              Sei pronta per scoprire il regalo?
+            </p>
+            <button 
+              onClick={handleOpenFinalLetter}
+              className="final-unlock-button"
+            >
+              Apri la Lettera Finale 💝
+            </button>
+          </div>
+        </div>
+      )}
+      
+      {/* Code Input (solo se non può ancora aprire la lettera finale) */}
+      {!canOpenFinalLetter && !showFinalLetter && (
         <div className="input-section">
           <CodeInput 
             onCodeSubmit={handleNewCodeSubmit}
@@ -156,7 +184,7 @@ export default function Home() {
       
       {/* Footer */}
       <footer className="app-footer">
-        <p>Made with ❤️ for Diana's Birthday</p>
+        <p>Fatto con il ❤️ da Danilo per i 22 anni di Diana</p>
         {process.env.NODE_ENV === 'development' && (
           <button 
             onClick={() => {

@@ -34,11 +34,11 @@ export default function LetterDisplay({ letter, isNew = false }: LetterDisplayPr
           ))}
         </div>
         
-        {isNew && (
+        {/* {isNew && (
           <div className="letter-badge">
             ✨ Nuovo messaggio sbloccato!
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

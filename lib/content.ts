@@ -24,7 +24,8 @@ Ti aspetta il primo mini-gioco: trova gli intrusi!`,
     title: 'Primo Pezzo',
     content: `Ok.
 
-Hai sbloccato il primo pezzo.
+Il primo gioco era molto semplice, serviva a rompere il ghiaccio.
+Il prossimo mini-gioco ti farà perdere più tempo, armati di pazienza.
 
 Per ora non serve capire nulla.
 
@@ -40,10 +41,24 @@ Alcune cose funzionano solo
 quando smetti di cercare risposte
 e continui ad andare avanti.
 
-Hai sbloccato tutti i pezzi del puzzle.
+Hai sbloccato il secondo pezzo.
 
-Ora sei pronta per la rivelazione finale.`,
+C'è ancora un ultimo gioco.
+
+Quando lo completi, troverai un altro codice.`,
     date: 'Livello 2'
+  },
+  {
+    level: 3,
+    title: 'Terzo Pezzo',
+    content: `Ok.
+
+Hai preso anche l'ultimo pezzo.
+
+Ora non serve più cercare.
+
+Ora puoi aprire la lettera finale.`,
+    date: 'Livello 3'
   },
 ];
 

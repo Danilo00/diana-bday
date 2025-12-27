@@ -85,11 +85,6 @@ export function useAppState() {
       .sort((a, b) => a!.level - b!.level);
   }, [state.unlockedLevels]);
   
-  // Verifica se la lettera finale è sbloccata
-  const isFinalLetterUnlocked = useCallback(() => {
-    return state.unlockedLevels.includes(4);
-  }, [state.unlockedLevels]);
-  
   return {
     state,
     isLoaded,
@@ -97,7 +92,6 @@ export function useAppState() {
     handleCompleteTutorial,
     handleCodeSubmit,
     getUnlockedLetters,
-    isFinalLetterUnlocked,
   };
 }
 

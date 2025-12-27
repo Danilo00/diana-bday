@@ -16,7 +16,7 @@ export const CODES: CodeMapping[] = [
   { code: 'A7Q9-M2KD', level: 0, type: 'tutorial' },
   { code: 'R4T8-LX91', level: 1, type: 'letter' },
   { code: 'C3M7-PA62', level: 2, type: 'letter' },
-  { code: 'J8F5-NR30', level: 3, type: 'final' },
+  { code: 'Z9K2-WE84', level: 3, type: 'letter' },
 ];
 
 /**

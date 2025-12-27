@@ -12,14 +12,16 @@ File: `lib/codes.ts`
 - `A7Q9-M2KD` - Tutorial
 - `R4T8-LX91` - Lettera 1  
 - `C3M7-PA62` - Lettera 2
-- `J8F5-NR30` - Lettera finale (dopo aver completato livello 2)
+- `Z9K2-WE84` - Lettera 3
+
+**Nota**: La lettera finale si apre con un pulsante dopo la Lettera 3 (nessun codice).
 
 ```typescript
 export const CODES: CodeMapping[] = [
   { code: 'TUOCODICE1', level: 0, type: 'tutorial' },
   { code: 'TUOCODICE2', level: 1, type: 'letter' },
   { code: 'TUOCODICE3', level: 2, type: 'letter' },
-  { code: 'TUOCODICE4', level: 3, type: 'final' },
+  { code: 'TUOCODICE4', level: 3, type: 'letter' },
 ];
 ```
 

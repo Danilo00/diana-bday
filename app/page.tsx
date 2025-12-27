@@ -17,7 +17,6 @@ export default function Home() {
     handleCompleteTutorial,
     handleCodeSubmit,
     getUnlockedLetters,
-    isFinalLetterUnlocked,
   } = useAppState();
   
   const [showWelcome, setShowWelcome] = useState(true);
@@ -110,13 +109,18 @@ export default function Home() {
   
   // Main app
   const unlockedLetters = getUnlockedLetters();
-  const finalUnlocked = isFinalLetterUnlocked();
-  const canOpenFinalLetter = state.currentLevel >= 2 && !showFinalLetter;
+  const canOpenFinalLetter = state.currentLevel >= 3 && !showFinalLetter;
+  const totalSteps = 5; // Tutorial + 3 messaggi + Rivelazione finale
+  const currentStep = showFinalLetter
+    ? totalSteps
+    : state.currentLevel >= 0
+      ? state.currentLevel + 1
+      : 1;
   
   return (
     <main className="main-container">
       {/* Success notification */}
-      {showSuccess && (
+      {/* {showSuccess && (
         <div className="success-notification">
           <div className="success-content">
             <span className="success-icon">✨</span>
@@ -124,7 +128,7 @@ export default function Home() {
             <span className="success-icon">✨</span>
           </div>
         </div>
-      )}
+      )} */}
       
       {/* Error notification */}
       {error && (
@@ -140,7 +144,7 @@ export default function Home() {
       <header className="app-header">
         <h1 className="app-title">🎁 Lettere per Diana 🎁</h1>
         <p className="app-subtitle">
-          Livello {state.currentLevel >= 0 ? state.currentLevel + 1 : 1} di 4
+          Livello {currentStep} di {totalSteps}
         </p>
       </header>
       
@@ -159,7 +163,7 @@ export default function Home() {
         />
       )}
       
-      {/* Pulsante per aprire lettera finale (quando sbloccato livello 2) */}
+      {/* Pulsante per aprire lettera finale (quando sbloccato livello 3) */}
       {canOpenFinalLetter && (
         <div className="final-unlock-section">
           <div className="final-unlock-content">

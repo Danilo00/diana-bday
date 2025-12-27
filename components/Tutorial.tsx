@@ -100,7 +100,7 @@ export default function Tutorial({ onComplete }: TutorialProps) {
             <div className="hint-box">
               <p>💡 Il primo codice dovrebbe essere scritto sulla lettera fisica che hai trovato nella prima scatola.</p>
               <p>Cerca qualcosa tipo: </p>
-              <code>A7Q9-M2KD</code>
+              <code>A7Q9</code>
             </div>
           )}
         </div>

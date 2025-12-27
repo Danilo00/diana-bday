@@ -37,10 +37,10 @@ npm start
 
 I codici sono configurati in `lib/codes.ts`:
 
-- `A7Q9-M2KD` - Tutorial (livello 0)
-- `R4T8-LX91` - Lettera 1 (livello 1)
-- `C3M7-PA62` - Lettera 2 (livello 2)
-- `Z9K2-WE84` - Lettera 3 (livello 3)
+- `A7Q9` - Tutorial (livello 0)
+- `R4T8` - Lettera 1 (livello 1)
+- `C3M7` - Lettera 2 (livello 2)
+- `Z9K2` - Lettera 3 (livello 3)
 
 **Nota**: la lettera finale non richiede un codice: si apre con il pulsante **“Apri la Lettera Finale 💝”**.
 

@@ -9,10 +9,10 @@ L'applicazione è **completamente funzionante** e testata. Tutti i componenti so
 File: `lib/codes.ts`
 
 **Cambia i codici prima di usare l'app!** Attualmente sono:
-- `A7Q9-M2KD` - Tutorial
-- `R4T8-LX91` - Lettera 1  
-- `C3M7-PA62` - Lettera 2
-- `Z9K2-WE84` - Lettera 3
+- `A7Q9` - Tutorial
+- `R4T8` - Lettera 1  
+- `C3M7` - Lettera 2
+- `Z9K2` - Lettera 3
 
 **Nota**: La lettera finale si apre con un pulsante dopo la Lettera 3 (nessun codice).
 
@@ -130,7 +130,7 @@ Per iniziare, visita:
 https://[tuo-dominio].vercel.app
 
 E inserisci questo codice:
-A7Q9-M2KD
+A7Q9
 
 Buon divertimento!
 ```

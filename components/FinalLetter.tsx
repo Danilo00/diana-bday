@@ -7,7 +7,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { debugLog } from '@/lib/debug';
 import { FINAL_LETTER } from '@/lib/content';
-import ImageLightbox from '@/components/ImageLightbox';
 
 interface FinalLetterProps {
   onComplete?: () => void;
@@ -287,13 +286,7 @@ export default function FinalLetter({ onComplete }: FinalLetterProps) {
               </div>
             </div>
             <div className="ticket-actions">
-              <ImageLightbox
-                src="/Biglietto.PNG"
-                alt="Biglietto per il Giappone"
-                title="Biglietto - zoom"
-                triggerLabel="Visualizza biglietto"
-                className="ticket-lightbox"
-              />              
+              <div className="ticket-hint">💝</div>
             </div>
           </div>
         </div>

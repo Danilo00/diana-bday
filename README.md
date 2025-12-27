@@ -4,21 +4,19 @@ Applicazione interattiva per un regalo di compleanno con sistema di sblocco prog
 
 ## 🎯 Caratteristiche
 
-- **Sistema a livelli**: 5 livelli totali (tutorial + 4 lettere)
-- **Sblocco progressivo**: ogni codice sblocca il livello successivo
+- **Sistema a livelli**: 3 livelli reali (il tutorial non conta nel contatore)
+- **Sblocco progressivo**: ogni codice sblocca il pezzo successivo
 - **Persistenza locale**: stato salvato in localStorage
 - **Mobile-first**: design ottimizzato per smartphone
 - **Debug logging**: sistema di logging configurabile
 - **Zero backend**: tutto funziona client-side
+- **Bottone flottante**: scorri sempre in fondo (utile per leggere i nuovi messaggi)
 
 ## 🚀 Installazione
 
 ```bash
 # Installa le dipendenze
 npm install
-
-# Copia il file di esempio per le variabili d'ambiente
-cp .env.local.example .env.local
 
 # Avvia in modalità sviluppo
 npm run dev
@@ -32,18 +30,19 @@ npm start
 
 1. **Welcome Screen**: introduzione al gioco
 2. **Tutorial**: spiega il meccanismo e richiede il primo codice
-3. **Lettere Progressive**: ogni codice sblocca una nuova lettera
-4. **Lettera Finale**: rivelazione completa con immagini e biglietto
+3. **3 Lettere Progressive**: ogni codice sblocca un nuovo pezzo (Livello 1-3)
+4. **Lettera Finale**: si apre con un pulsante dopo il terzo pezzo
 
 ## 🔐 Codici Predefiniti
 
 I codici sono configurati in `lib/codes.ts`:
 
-- `INIZIO2025` - Tutorial (livello 0)
-- `RICORDO1` - Lettera 1 (livello 1)
-- `MOMENTO2` - Lettera 2 (livello 2)
-- `SOGNO3` - Lettera 3 (livello 3)
-- `GIAPPONE` - Lettera finale (livello 4)
+- `A7Q9-M2KD` - Tutorial (livello 0)
+- `R4T8-LX91` - Lettera 1 (livello 1)
+- `C3M7-PA62` - Lettera 2 (livello 2)
+- `Z9K2-WE84` - Lettera 3 (livello 3)
+
+**Nota**: la lettera finale non richiede un codice: si apre con il pulsante **“Apri la Lettera Finale 💝”**.
 
 **⚠️ Importante**: Modifica questi codici prima di usare l'app!
 
@@ -55,6 +54,14 @@ Modifica `lib/content.ts` per personalizzare:
 - Contenuto delle lettere (array `LETTERS`)
 - Lettera finale (`FINAL_LETTER`)
 - Titoli e date
+
+### Token speciali nella lettera finale
+
+Dentro `FINAL_LETTER.content` puoi usare:
+- `[PAUSE]`, `[PAUSE_LONG]`, `[PAUSE_FINAL]`: pause tra le sezioni
+- `[PAUSE_BEAT]`: **pausa breve extra** (a tua discrezione)
+- `[IMAGE_1]`, `[IMAGE_2]`, `[IMAGE_3]`: indizi
+- `[TICKET]`: ticket finale
 
 ### Stile e Colori
 
@@ -112,6 +119,7 @@ location.reload();
 │   ├── LetterDisplay.tsx # Visualizzazione singola lettera
 │   ├── LettersHistory.tsx # Storia lettere sbloccate
 │   └── FinalLetter.tsx   # Lettera finale con immagini
+│   └── ScrollToBottomFab.tsx # Bottone flottante "vai in fondo"
 ├── lib/
 │   ├── debug.ts          # Sistema di logging
 │   ├── codes.ts          # Validazione codici
@@ -147,7 +155,7 @@ Tutti i componenti sono:
 - Next.js 15
 - React 19
 - TypeScript
-- Tailwind CSS
+- (Nessun Tailwind: styling custom in `app/globals.css`)
 
 ## 🎁 Personalizzazione Finale
 

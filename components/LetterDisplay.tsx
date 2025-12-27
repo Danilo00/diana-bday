@@ -16,7 +16,7 @@ export default function LetterDisplay({ letter, isNew = false }: LetterDisplayPr
   debugLog.debug('LetterDisplay rendered', { level: letter.level, isNew });
   
   return (
-    <div className={`letter-container ${isNew ? 'letter-new' : ''}`}>
+    <div className={`letter-container ${isNew ? 'letter-container' : ''}`}>
       <div className="letter-content">
         {letter.date && (
           <div className="letter-date">{letter.date}</div>

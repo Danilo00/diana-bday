@@ -89,7 +89,6 @@ function buildFinalSteps(content: string): FinalStep[] {
 export default function FinalLetter({ onComplete }: FinalLetterProps) {
   const steps = useMemo(() => buildFinalSteps(FINAL_LETTER.content), []);
   const [visibleCount, setVisibleCount] = useState(1);
-  const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
   const timersRef = useRef<number[]>([]);
 
   useEffect(() => {
@@ -131,7 +130,6 @@ export default function FinalLetter({ onComplete }: FinalLetterProps) {
     // scroll controllato: vai alla sezione appena apparsa, senza tornare in cima
     if (typeof window === 'undefined') return;
     if (visibleCount <= 0) return;
-    if (!autoScrollEnabled) return;
 
     const el = document.querySelector(`[data-section="${visibleCount}"]`) as HTMLElement | null;
     if (!el) return;
@@ -139,22 +137,7 @@ export default function FinalLetter({ onComplete }: FinalLetterProps) {
     const rect = el.getBoundingClientRect();
     const targetTop = window.scrollY + rect.top - 96; // offset per header/spazio respiro
     window.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
-  }, [autoScrollEnabled, visibleCount]);
-
-  useEffect(() => {
-    // Se l'utente interagisce, disabilita l'auto-scroll (evita click intercettati).
-    const onUserIntent = () => setAutoScrollEnabled(false);
-
-    window.addEventListener('wheel', onUserIntent, { passive: true });
-    window.addEventListener('touchstart', onUserIntent, { passive: true });
-    window.addEventListener('pointerdown', onUserIntent, { passive: true });
-
-    return () => {
-      window.removeEventListener('wheel', onUserIntent);
-      window.removeEventListener('touchstart', onUserIntent);
-      window.removeEventListener('pointerdown', onUserIntent);
-    };
-  }, []);
+  }, [visibleCount]);
 
   const renderStep = (step: FinalStep, idx: number) => {
     const sectionIndex = idx + 1;
@@ -332,10 +315,10 @@ export default function FinalLetter({ onComplete }: FinalLetterProps) {
       
       <div className={`final-footer ${visibleCount >= steps.length ? 'visible' : 'hidden'}`}>
         <p className="completion-message">
-          🎉 Hai completato il viaggio! 🎉
+          🎉 Tanti auguri! 🎉
         </p>
         <p className="final-note">
-          Questa è solo l'inizio della nostra avventura...
+          Questo è solo l'inizio della nostra nuova avventura...
         </p>
       </div>
     </div>

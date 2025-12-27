@@ -31,7 +31,8 @@ export default function Home() {
   const [finalLetterRunId, setFinalLetterRunId] = useState(0);
   const [forceReplayAnimation, setForceReplayAnimation] = useState(false);
   const [showResetDialog, setShowResetDialog] = useState(false);
-  const resetHoldTimerRef = useRef<number | null>(null);
+  const resetTapCountRef = useRef(0);
+  const resetTapWindowTimerRef = useRef<number | null>(null);
   
   debugLog.debug('Home page rendered', { state, isLoaded });
 
@@ -120,18 +121,29 @@ export default function Home() {
     }, 50);
   };
 
-  const startFooterHold = () => {
-    if (resetHoldTimerRef.current) window.clearTimeout(resetHoldTimerRef.current);
-    resetHoldTimerRef.current = window.setTimeout(() => {
-      debugLog.info('Footer long-press: open reset dialog');
-      setShowResetDialog(true);
-    }, 5000);
-  };
+  const handleFooterTap = () => {
+    // 5 tap entro una finestra breve (mobile friendly)
+    resetTapCountRef.current += 1;
+    debugLog.debug('Footer tap', { count: resetTapCountRef.current });
 
-  const cancelFooterHold = () => {
-    if (resetHoldTimerRef.current) {
-      window.clearTimeout(resetHoldTimerRef.current);
-      resetHoldTimerRef.current = null;
+    if (resetTapWindowTimerRef.current) {
+      window.clearTimeout(resetTapWindowTimerRef.current);
+    }
+
+    // reset contatore se l'utente smette di tappare per ~2s
+    resetTapWindowTimerRef.current = window.setTimeout(() => {
+      resetTapCountRef.current = 0;
+      resetTapWindowTimerRef.current = null;
+    }, 2000);
+
+    if (resetTapCountRef.current >= 5) {
+      resetTapCountRef.current = 0;
+      if (resetTapWindowTimerRef.current) {
+        window.clearTimeout(resetTapWindowTimerRef.current);
+        resetTapWindowTimerRef.current = null;
+      }
+      debugLog.info('Footer 5-tap: open reset dialog');
+      setShowResetDialog(true);
     }
   };
   
@@ -259,12 +271,9 @@ export default function Home() {
         <button
           type="button"
           className="app-footer-hold"
-          onPointerDown={startFooterHold}
-          onPointerUp={cancelFooterHold}
-          onPointerCancel={cancelFooterHold}
-          onPointerLeave={cancelFooterHold}
+          onClick={handleFooterTap}
           onContextMenu={(e) => e.preventDefault()}
-          aria-label="Tieni premuto 5 secondi per reset"
+          aria-label="Tocca 5 volte per reset"
         >
           Fatto con il ❤️ da Danilo per i 22 anni di Diana
         </button>

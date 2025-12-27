@@ -43,9 +43,7 @@ e continui ad andare avanti.
 
 Hai sbloccato il secondo pezzo.
 
-C'è ancora un ultimo gioco.
-
-Quando lo completi, troverai un altro codice.`,
+C'è ancora un ultimo gioco, tranquilla è più semplice del secondo.`,
     date: 'Livello 2'
   },
   {
@@ -53,11 +51,13 @@ Quando lo completi, troverai un altro codice.`,
     title: 'Terzo Pezzo',
     content: `Ok.
 
-Hai preso anche l'ultimo pezzo.
+Dai, questa era facile.
 
-Ora non serve più cercare.
+I giochi sono finiti, congratulazioni.
 
-Ora puoi aprire la lettera finale.`,
+Ora puoi aprire la lettera finale.
+
+Leggi ad alta voce`,
     date: 'Livello 3'
   },
 ];
@@ -67,7 +67,7 @@ export const FINAL_LETTER = {
   title: 'La Lettera',
   content: `Ora puoi fermarti.
 
-Ora posso dirti tutto.
+Ora... posso dirti tutto.
 
 [PAUSE]
 
@@ -76,7 +76,7 @@ C'è stato un compleanno in cui, senza saperlo, ho alzato l'asticella molto in a
 [PAUSE]
 
 Ti avevo promesso un viaggio.
-E non era solo un viaggio.
+Che poi alla fine abbiamo fatto insieme.
 
 [PAUSE]
 
@@ -90,13 +90,21 @@ E alla fine ho capito una cosa.
 
 Non dovevo superarlo.
 
+[PAUSE]
+
 Potevo uguagliarlo.
 
+[PAUSE]
+
 E per farlo, ho provato a raccontartelo senza dirtelo...
+
+[PAUSE]
 
 [INDIZI_START]
 
 [IMAGE_1]
+
+[PAUSE_BEAT]
 
 Nel primo gioco c'era un aereo.
 
@@ -107,6 +115,8 @@ Perché quello che faremo
 
 [IMAGE_2]
 
+[PAUSE_BEAT]
+
 Nel secondo c'era un fiore.
 
 Perché il momento giusto
@@ -115,6 +125,8 @@ Perché il momento giusto
 [PAUSE]
 
 [IMAGE_3]
+
+[PAUSE_BEAT]
 
 Nell'ultimo c'era una pallina rossa, su uno sfondo bianco.
 

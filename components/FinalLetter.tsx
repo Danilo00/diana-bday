@@ -7,6 +7,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { debugLog } from '@/lib/debug';
 import { FINAL_LETTER } from '@/lib/content';
+import ImageLightbox from '@/components/ImageLightbox';
 
 interface FinalLetterProps {
   onComplete?: () => void;
@@ -21,13 +22,15 @@ type FinalStep =
 
 function buildFinalSteps(content: string): FinalStep[] {
   const parts = content.split(
-    /(\[PAUSE\]|\[PAUSE_LONG\]|\[PAUSE_FINAL\]|\[IMAGE_\d+\]|\[TICKET\]|\[INDIZI_START\])/
+    /(\[PAUSE\]|\[PAUSE_LONG\]|\[PAUSE_FINAL\]|\[PAUSE_BEAT\]|\[IMAGE_\d+\]|\[TICKET\]|\[INDIZI_START\])/
   );
 
   const steps: FinalStep[] = [];
   const PAUSE_SHORT = 6000;
   const PAUSE_LONG = 10000;
-  const PAUSE_FINAL = 15000;
+  const PAUSE_FINAL = 10000;
+  // Pausa breve extra (usala liberamente nel contenuto con [PAUSE_BEAT])
+  const PAUSE_BEAT = 1500;
 
   const addDelayToPrev = (ms: number) => {
     if (steps.length === 0) return;
@@ -49,6 +52,10 @@ function buildFinalSteps(content: string): FinalStep[] {
     }
     if (part === '[PAUSE_FINAL]') {
       addDelayToPrev(PAUSE_FINAL);
+      continue;
+    }
+    if (part === '[PAUSE_BEAT]') {
+      addDelayToPrev(PAUSE_BEAT);
       continue;
     }
     if (part === '[INDIZI_START]') {
@@ -82,6 +89,7 @@ function buildFinalSteps(content: string): FinalStep[] {
 export default function FinalLetter({ onComplete }: FinalLetterProps) {
   const steps = useMemo(() => buildFinalSteps(FINAL_LETTER.content), []);
   const [visibleCount, setVisibleCount] = useState(1);
+  const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
   const timersRef = useRef<number[]>([]);
 
   useEffect(() => {
@@ -123,6 +131,7 @@ export default function FinalLetter({ onComplete }: FinalLetterProps) {
     // scroll controllato: vai alla sezione appena apparsa, senza tornare in cima
     if (typeof window === 'undefined') return;
     if (visibleCount <= 0) return;
+    if (!autoScrollEnabled) return;
 
     const el = document.querySelector(`[data-section="${visibleCount}"]`) as HTMLElement | null;
     if (!el) return;
@@ -130,7 +139,22 @@ export default function FinalLetter({ onComplete }: FinalLetterProps) {
     const rect = el.getBoundingClientRect();
     const targetTop = window.scrollY + rect.top - 96; // offset per header/spazio respiro
     window.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
-  }, [visibleCount]);
+  }, [autoScrollEnabled, visibleCount]);
+
+  useEffect(() => {
+    // Se l'utente interagisce, disabilita l'auto-scroll (evita click intercettati).
+    const onUserIntent = () => setAutoScrollEnabled(false);
+
+    window.addEventListener('wheel', onUserIntent, { passive: true });
+    window.addEventListener('touchstart', onUserIntent, { passive: true });
+    window.addEventListener('pointerdown', onUserIntent, { passive: true });
+
+    return () => {
+      window.removeEventListener('wheel', onUserIntent);
+      window.removeEventListener('touchstart', onUserIntent);
+      window.removeEventListener('pointerdown', onUserIntent);
+    };
+  }, []);
 
   const renderStep = (step: FinalStep, idx: number) => {
     const sectionIndex = idx + 1;
@@ -259,22 +283,35 @@ export default function FinalLetter({ onComplete }: FinalLetterProps) {
         <div className="ticket-reveal-container">
           <div className="ticket-container">
             <div className="ticket-shine" />
-            <h2 className="ticket-title">✈️ Il Tuo Regalo ✈️</h2>
+            <h2 className="ticket-title">✈️ Il Tuo Regalo</h2>
+            <p className="ticket-subtitle">Aprilo. Guardalo bene. È reale.</p>
             <div className="ticket-content">
-              <img
+              <div className="ticket-image-wrap">
+                <img
+                  src="/Biglietto.PNG"
+                  alt="Biglietto per il Giappone"
+                  draggable={false}
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    borderRadius: '12px',
+                    userSelect: 'none',
+                    pointerEvents: 'none',
+                    display: 'block',
+                    boxShadow: '0 12px 40px rgba(0,0,0,0.35)',
+                  }}
+                />
+              </div>
+            </div>
+            <div className="ticket-actions">
+              <ImageLightbox
                 src="/Biglietto.PNG"
                 alt="Biglietto per il Giappone"
-                draggable={false}
-                style={{
-                  width: '100%',
-                  height: 'auto',
-                  borderRadius: '12px',
-                  userSelect: 'none',
-                  pointerEvents: 'none',
-                  display: 'block',
-                  boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
-                }}
+                title="Biglietto - zoom"
+                triggerLabel="Apri biglietto (zoom)"
+                className="ticket-lightbox"
               />
+              <div className="ticket-hint">Puoi zoomare e scaricarlo. (ESC per chiudere)</div>
             </div>
           </div>
         </div>

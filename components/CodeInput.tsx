@@ -63,7 +63,7 @@ export default function CodeInput({ onCodeSubmit, currentLevel, disabled = false
               type="text"
               value={code}
               onChange={(e) => handleChange(e.target.value)}
-              placeholder="ES: CODICE123"
+              placeholder="ES: A7Q9-M2KD"
               className={`code-input ${error ? 'error' : ''}`}
               disabled={disabled || isSubmitting}
               autoComplete="off"

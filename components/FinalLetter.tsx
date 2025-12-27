@@ -96,10 +96,26 @@ export default function FinalLetter({ onComplete, animate = true }: FinalLetterP
   const [visibleCount, setVisibleCount] = useState(1);
   const timersRef = useRef<number[]>([]);
   const audioCtxRef = useRef<AudioContext | null>(null);
+  const [soundsEnabled, setSoundsEnabled] = useState(false);
+  const [soundsSupported, setSoundsSupported] = useState(true);
+
+  const SOUNDS_STORAGE_KEY = 'diana-bday-sounds-enabled';
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const AudioCtx = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext | undefined;
+    if (!AudioCtx) {
+      setSoundsSupported(false);
+      return;
+    }
+    const stored = window.localStorage.getItem(SOUNDS_STORAGE_KEY);
+    if (stored === 'true') setSoundsEnabled(true);
+  }, []);
 
   const playPauseBeep = () => {
     try {
       if (typeof window === 'undefined') return;
+      if (!soundsEnabled) return;
       const AudioCtx = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext | undefined;
       if (!AudioCtx) return;
 
@@ -128,6 +144,45 @@ export default function FinalLetter({ onComplete, animate = true }: FinalLetterP
       osc.stop(now + 0.09);
     } catch {
       // browser may block audio; ignore
+    }
+  };
+
+  const handleEnableSounds = () => {
+    try {
+      if (typeof window === 'undefined') return;
+      const AudioCtx = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext | undefined;
+      if (!AudioCtx) {
+        setSoundsSupported(false);
+        return;
+      }
+
+      if (!audioCtxRef.current) audioCtxRef.current = new AudioCtx();
+      const ctx = audioCtxRef.current;
+
+      // user gesture: prova a sbloccare
+      if (ctx.state === 'suspended') {
+        ctx.resume().catch(() => {});
+      }
+
+      window.localStorage.setItem(SOUNDS_STORAGE_KEY, 'true');
+      setSoundsEnabled(true);
+
+      // beep di test
+      setTimeout(() => {
+        playPauseBeep();
+      }, 50);
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleDisableSounds = () => {
+    try {
+      if (typeof window === 'undefined') return;
+      window.localStorage.setItem(SOUNDS_STORAGE_KEY, 'false');
+      setSoundsEnabled(false);
+    } catch {
+      // ignore
     }
   };
 
@@ -367,6 +422,19 @@ export default function FinalLetter({ onComplete, animate = true }: FinalLetterP
       <div className="final-letter-header">
         <h1 className="final-title">{FINAL_LETTER.title}</h1>
         <div className="sparkles">✨💝✨</div>
+        {soundsSupported && (
+          <div className="final-sounds-bar">
+            {!soundsEnabled ? (
+              <button type="button" className="final-sounds-btn" onClick={handleEnableSounds}>
+                🔊 Abilita suoni
+              </button>
+            ) : (
+              <button type="button" className="final-sounds-btn" onClick={handleDisableSounds}>
+                🔇 Disattiva suoni
+              </button>
+            )}
+          </div>
+        )}
       </div>
       
       <div className="final-letter-content">

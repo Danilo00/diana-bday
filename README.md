@@ -174,4 +174,4 @@ Progetto personale - Tutti i diritti riservati
 
 ---
 
-Made with ❤️ for Diana's Birthday
+Fatto con il ❤️ da Danilo per i 22 anni di Diana

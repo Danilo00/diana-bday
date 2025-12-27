@@ -565,18 +565,34 @@ body {
   margin-bottom: 1rem;
 }
 
-.image-marker {
-  margin: 3rem 0;
+/* Reveal Sections */
+.reveal-section {
+  margin: 2rem 0;
+  transition: all 0.8s ease-out;
 }
 
-.reveal-image {
-  animation: fadeInUp 0.8s ease-out;
+.reveal-section.hidden {
+  opacity: 0;
+  transform: translateY(30px);
+  max-height: 0;
+  overflow: hidden;
+  margin: 0;
+}
+
+.reveal-section.visible {
+  opacity: 1;
+  transform: translateY(0);
+  max-height: 2000px;
+}
+
+.text-section.visible {
+  animation: fadeInUp 0.8s ease-out forwards;
 }
 
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -584,43 +600,75 @@ body {
   }
 }
 
+.image-reveal {
+  animation: scaleIn 1s ease-out;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .image-placeholder {
   background: var(--color-background);
-  border: 3px dashed var(--color-border);
+  border: 3px solid var(--color-border);
   border-radius: 16px;
   padding: 2rem;
   text-align: center;
+  margin: 2rem 0;
 }
 
 .image-caption {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   font-weight: 600;
   color: var(--color-primary);
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .image-box {
   background: white;
   border-radius: 12px;
-  padding: 3rem 2rem;
+  padding: 2rem;
   margin: 1rem 0;
   min-height: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-text-light);
-  font-style: italic;
+  box-shadow: var(--shadow-sm);
 }
 
-.image-hint {
+.image-placeholder-content {
   color: var(--color-text-light);
   font-style: italic;
-  margin-top: 1rem;
+  text-align: center;
+  padding: 2rem;
+  line-height: 1.8;
 }
 
 /* Ticket Reveal */
-.ticket-reveal {
+.ticket-reveal-container {
   margin: 4rem 0;
+  animation: ticketAppear 1.2s ease-out;
+}
+
+@keyframes ticketAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(50px) scale(0.9);
+  }
+  60% {
+    transform: translateY(-10px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .ticket-container {
@@ -734,6 +782,20 @@ body {
   padding: 2rem;
   background: var(--color-background);
   border-radius: 16px;
+  transition: all 0.8s ease-out;
+}
+
+.final-footer.hidden {
+  opacity: 0;
+  max-height: 0;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+.final-footer.visible {
+  opacity: 1;
+  max-height: 500px;
 }
 
 .completion-message {

@@ -13,11 +13,11 @@ export interface CodeMapping {
 
 // Mappatura dei codici
 export const CODES: CodeMapping[] = [
-  { code: 'INIZIO2025', level: 0, type: 'tutorial' },
-  { code: 'RICORDO1', level: 1, type: 'letter' },
-  { code: 'MOMENTO2', level: 2, type: 'letter' },
-  { code: 'SOGNO3', level: 3, type: 'letter' },
-  { code: 'GIAPPONE', level: 4, type: 'final' },
+  { code: 'A7Q9-M2KD', level: 0, type: 'tutorial' },
+  { code: 'R4T8-LX91', level: 1, type: 'letter' },
+  { code: 'C3M7-PA62', level: 2, type: 'letter' },
+  { code: 'Z9K2-WE84', level: 3, type: 'letter' },
+  { code: 'J8F5-NR30', level: 4, type: 'final' },
 ];
 
 /**
@@ -26,8 +26,8 @@ export const CODES: CodeMapping[] = [
 export function validateCode(code: string, currentLevel: number): CodeMapping | null {
   debugLog.debug('Validating code', { code, currentLevel });
   
-  const normalizedCode = code.trim().toUpperCase();
-  const mapping = CODES.find(c => c.code === normalizedCode);
+  const normalizedCode = code.trim().toUpperCase().replace(/\s+/g, '');
+  const mapping = CODES.find(c => c.code.replace(/\s+/g, '') === normalizedCode);
   
   if (!mapping) {
     debugLog.info('Code not found', normalizedCode);
@@ -48,8 +48,8 @@ export function validateCode(code: string, currentLevel: number): CodeMapping | 
  * Verifica se un codice è già stato usato
  */
 export function isCodeUsed(code: string, unlockedLevels: number[]): boolean {
-  const normalizedCode = code.trim().toUpperCase();
-  const mapping = CODES.find(c => c.code === normalizedCode);
+  const normalizedCode = code.trim().toUpperCase().replace(/\s+/g, '');
+  const mapping = CODES.find(c => c.code.replace(/\s+/g, '') === normalizedCode);
   
   if (!mapping) return false;
   

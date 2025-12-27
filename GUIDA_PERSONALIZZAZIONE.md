@@ -9,11 +9,11 @@ L'applicazione è **completamente funzionante** e testata. Tutti i componenti so
 File: `lib/codes.ts`
 
 **Cambia i codici prima di usare l'app!** Attualmente sono:
-- `INIZIO2025` - Tutorial
-- `RICORDO1` - Lettera 1
-- `MOMENTO2` - Lettera 2
-- `SOGNO3` - Lettera 3
-- `GIAPPONE` - Lettera finale
+- `A7Q9-M2KD` - Tutorial
+- `R4T8-LX91` - Lettera 1
+- `C3M7-PA62` - Lettera 2
+- `Z9K2-WE84` - Lettera 3
+- `J8F5-NR30` - Lettera finale
 
 ```typescript
 export const CODES: CodeMapping[] = [

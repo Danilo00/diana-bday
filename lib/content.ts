@@ -12,135 +12,118 @@ export interface LetterContent {
 export const LETTERS: LetterContent[] = [
   {
     level: 0,
-    title: 'Benvenuta nel gioco',
-    content: `Ciao amore mio,
+    title: 'Benvenuta.',
+    content: `Questa applicazione serve a leggere il tuo regalo,
+ma non tutto insieme.
 
-Se stai leggendo questo, hai aperto la prima scatola e scoperto come funziona questo gioco.
+Ogni volta che completerai un livello del gioco fisico,
+riceverai un codice.
 
-Ogni lettera fisica che troverai conterrà un codice.
-Ogni codice sbloccherà una parte del messaggio che ho preparato per te.
+Inserendo il codice qui, sbloccherai una nuova parte del messaggio.
 
-Non cercare di saltare avanti.
-Non leggere tutto in una volta.
-Ogni pezzo ha senso solo quando arriva il suo momento.
+Alcuni contenuti, da soli, non avranno molto senso.
+È normale.
 
-Alla fine, tutto si ricomporrà.
+Il significato completo arriverà solo alla fine.
 
-Questo è solo l'inizio.
-
-Con tutto il mio amore,
-Il tuo esploratore di sogni`,
-    date: '27 Dicembre 2025'
+Quando troverai un nuovo codice, inseriscilo qui sotto.`,
+    date: 'Tutorial'
   },
   {
     level: 1,
-    title: 'Frammento I',
-    content: `Diana,
+    title: 'Primo Pezzo',
+    content: `Ok.
 
-Ricordi quella sera sul balcone?
-Le stelle, il freddo, le tue mani nelle mie.
-Hai detto: "Un giorno vorrei vedere il mondo con te."
+Hai sbloccato il primo pezzo.
 
-Quel giorno non mi sembrava reale.
-Ora lo è.
+Per ora non serve capire nulla.
 
-Ma ancora non puoi sapere cosa significa.
 Continua a giocare.`,
-    date: 'Lettera 1'
+    date: 'Livello 1'
   },
   {
     level: 2,
-    title: 'Frammento II',
-    content: `Ogni volta che parliamo di viaggi,
-i tuoi occhi si illuminano.
+    title: 'Secondo Pezzo',
+    content: `Non tutto va spiegato subito.
 
-Tokyo. Kyoto. I ciliegi in fiore.
-I templi. Le lucine. Il monte Fuji.
-
-Ne parli come di un sogno lontano.
-
-E se ti dicessi che i sogni
-a volte si avvicinano più di quanto pensi?
-
-Ancora un passo.`,
-    date: 'Lettera 2'
+Alcune cose funzionano solo
+quando smetti di cercare risposte
+e continui ad andare avanti.`,
+    date: 'Livello 2'
   },
   {
     level: 3,
-    title: 'Frammento III',
-    content: `Ho passato settimane a organizzare questo momento.
-Ogni scatola, ogni indizio, ogni parola.
+    title: 'Ultimo Pezzo',
+    content: `Hai finalmente sbloccato l'ultimo pezzo del puzzle.
 
-Volevo che fosse speciale.
-Volevo che fosse magico.
-Volevo che fossi tu al centro di tutto.
-
-Perché meriti la magia.
-Perché meriti il mondo.
-
-E il mondo sta per aprirsi davanti a te.
-
-Un ultimo codice. Un ultimo passo.`,
-    date: 'Lettera 3'
+Ora puoi leggere la lettera finale.`,
+    date: 'Livello 3'
   },
 ];
 
 export const FINAL_LETTER = {
   level: 4,
-  title: '🌸 Il Regalo 🌸',
-  content: `Diana, amore mio,
+  title: 'La Lettera',
+  content: `Ora puoi fermarti.
 
-Ogni scatola che hai aperto, ogni codice che hai inserito, ogni lettera che hai letto... tutto ti ha portato qui.
+Ora posso dirti tutto.
 
-Questo non è solo un gioco.
-È un viaggio che inizia oggi e continua davvero.
+[PAUSE]
 
-Perché...
+C'è stato un compleanno in cui, senza saperlo, ho alzato l'asticella molto in alto.
+
+[PAUSE]
+
+Ti avevo promesso un viaggio.
+E non era solo un viaggio.
+
+[PAUSE]
+
+Negli anni ho pensato tante volte a come superare quel regalo…
+
+[PAUSE]
+
+E alla fine ho capito una cosa.
+
+[PAUSE_LONG]
+
+Non dovevo superarlo.
+
+Potevo uguagliarlo.
+
+E per farlo, ho provato a raccontartelo senza dirtelo...
+
+[INDIZI_START]
 
 [IMAGE_1]
 
-...ricordi le differenze che hai trovato?
-Erano indizi.
+Nel primo gioco c'era un aereo.
+
+Perché quello che faremo
+è partire.
+
+[PAUSE]
 
 [IMAGE_2]
 
-...e il fiore?
-Non era solo decorazione.
+Nel secondo c'era un fiore.
+
+Perché il momento giusto
+è quando tutto fiorisce, la primavera.
+
+[PAUSE]
 
 [IMAGE_3]
 
-...e la pallina rossa?
-Era la bandiera che cercavi.
+Nell'ultimo c'era una pallina rossa, su uno sfondo bianco.
 
-La bandiera del Giappone.
+Una bandiera, la nostra destinazione.
 
-Perché Diana, 
+[PAUSE_FINAL]
 
-[TICKET]
+Buon compleanno amore.
 
-STIAMO ANDANDO IN GIAPPONE.
-
-Io e te.
-I ciliegi in fiore.
-Le strade di Tokyo.
-I templi di Kyoto.
-Il monte Fuji all'alba.
-
-Tutto quello di cui hai sempre sognato.
-
-Questo è il tuo regalo.
-Questo è il nostro regalo.
-
-Perché i sogni non devono restare sogni.
-E perché voglio vedere il mondo attraverso i tuoi occhi.
-
-Buon compleanno, amore mio.
-Preparati a vivere la magia.
-
-Con tutto me stesso,
-[Il tuo nome]
-
-P.S. Le date esatte sono dentro l'ultima scatola. Preparati a fare la valigia! 🎌✈️🌸`,
+[TICKET]`,
 };
 
 /**
@@ -149,4 +132,3 @@ P.S. Le date esatte sono dentro l'ultima scatola. Preparati a fare la valigia! �
 export function getLetterContent(level: number): LetterContent | null {
   return LETTERS.find(l => l.level === level) || null;
 }
-

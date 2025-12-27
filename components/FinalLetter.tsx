@@ -1,5 +1,5 @@
 /**
- * Componente FinalLetter - Lettera finale con immagini e biglietto
+ * Componente FinalLetter - Lettera finale con pause e reveal progressivo
  */
 
 'use client';
@@ -13,159 +13,258 @@ interface FinalLetterProps {
 }
 
 export default function FinalLetter({ onComplete }: FinalLetterProps) {
-  const [visibleImages, setVisibleImages] = useState<Set<string>>(new Set());
+  const [visibleSections, setVisibleSections] = useState<Set<number>>(new Set([0]));
+  const [currentSection, setCurrentSection] = useState(0);
   const contentRef = useRef<HTMLDivElement>(null);
+  const timeoutsRef = useRef<NodeJS.Timeout[]>([]);
   
   debugLog.info('FinalLetter component mounted');
   
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const imageId = entry.target.getAttribute('data-image-id');
-            if (imageId) {
-              debugLog.debug('Image marker visible', imageId);
-              setVisibleImages((prev) => new Set([...prev, imageId]));
-            }
-          }
-        });
-      },
-      { threshold: 0.5 }
-    );
-    
-    // Osserva tutti i marker delle immagini
-    const markers = contentRef.current?.querySelectorAll('[data-image-id]');
-    markers?.forEach((marker) => observer.observe(marker));
-    
-    return () => observer.disconnect();
+    // Pulisci i timeout quando il componente si smonta
+    return () => {
+      timeoutsRef.current.forEach(timeout => clearTimeout(timeout));
+    };
   }, []);
   
-  // Processa il contenuto per inserire i marker delle immagini
-  const renderContent = () => {
-    const parts = FINAL_LETTER.content.split(/(\[IMAGE_\d+\]|\[TICKET\])/);
+  // Gestisce il reveal progressivo delle sezioni
+  const revealNextSection = (sectionIndex: number) => {
+    const timeout = setTimeout(() => {
+      debugLog.debug('Revealing section', sectionIndex);
+      setVisibleSections(prev => new Set([...prev, sectionIndex]));
+      setCurrentSection(sectionIndex);
+      
+      // Scroll automatico alla nuova sezione
+      setTimeout(() => {
+        const element = document.querySelector(`[data-section="${sectionIndex}"]`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    }, 0);
     
-    return parts.map((part, index) => {
+    timeoutsRef.current.push(timeout);
+  };
+  
+  // Processa il contenuto con pause e reveal progressivo
+  const renderContent = () => {
+    const parts = FINAL_LETTER.content.split(/(\[PAUSE\]|\[PAUSE_LONG\]|\[PAUSE_FINAL\]|\[IMAGE_\d+\]|\[TICKET\]|\[INDIZI_START\])/);
+    
+    let sectionIndex = 0;
+    let pauseDelay = 0;
+    const PAUSE_SHORT = 2000;
+    const PAUSE_LONG = 3500;
+    const PAUSE_FINAL = 4000;
+    
+    const elements: React.ReactElement[] = [];
+    
+    parts.forEach((part, index) => {
+      if (part.match(/\[PAUSE\]/)) {
+        pauseDelay += PAUSE_SHORT;
+        if (sectionIndex < 20) {
+          setTimeout(() => revealNextSection(sectionIndex + 1), pauseDelay);
+        }
+        return;
+      }
+      
+      if (part.match(/\[PAUSE_LONG\]/)) {
+        pauseDelay += PAUSE_LONG;
+        if (sectionIndex < 20) {
+          setTimeout(() => revealNextSection(sectionIndex + 1), pauseDelay);
+        }
+        return;
+      }
+      
+      if (part.match(/\[PAUSE_FINAL\]/)) {
+        pauseDelay += PAUSE_FINAL;
+        if (sectionIndex < 20) {
+          setTimeout(() => revealNextSection(sectionIndex + 1), pauseDelay);
+        }
+        return;
+      }
+      
+      if (part.match(/\[INDIZI_START\]/)) {
+        pauseDelay += 1000;
+        if (sectionIndex < 20) {
+          setTimeout(() => revealNextSection(sectionIndex + 1), pauseDelay);
+        }
+        return;
+      }
+      
       if (part.match(/\[IMAGE_1\]/)) {
-        return (
-          <div key={index} data-image-id="image1" className="image-marker">
-            {visibleImages.has('image1') && (
-              <div className="reveal-image">
-                <div className="image-placeholder image-1">
-                  <p className="image-caption">🔍 Gioco delle differenze</p>
-                  <div className="image-box">
-                    [Qui andrà l'immagine del gioco delle differenze]
+        sectionIndex++;
+        const currentIdx = sectionIndex;
+        elements.push(
+          <div 
+            key={`section-${currentIdx}`}
+            data-section={currentIdx}
+            className={`reveal-section ${visibleSections.has(currentIdx) ? 'visible' : 'hidden'}`}
+          >
+            <div className="image-reveal">
+              <div className="image-placeholder image-1">
+                <p className="image-caption">✈️ Indizio 1: L'Aereo</p>
+                <div className="image-box">
+                  <div className="image-placeholder-content">
+                    [Inserisci qui l'immagine del gioco delle differenze con l'aereo]
                   </div>
-                  <p className="image-hint">Le differenze formavano un simbolo...</p>
                 </div>
               </div>
-            )}
+            </div>
           </div>
         );
+        pauseDelay += 500;
+        if (currentIdx < 20) {
+          setTimeout(() => revealNextSection(currentIdx + 1), pauseDelay);
+        }
+        return;
       }
       
       if (part.match(/\[IMAGE_2\]/)) {
-        return (
-          <div key={index} data-image-id="image2" className="image-marker">
-            {visibleImages.has('image2') && (
-              <div className="reveal-image">
-                <div className="image-placeholder image-2">
-                  <p className="image-caption">🌸 Il fiore</p>
-                  <div className="image-box">
-                    [Qui andrà l'immagine del fiore - ciliegio]
+        sectionIndex++;
+        const currentIdx = sectionIndex;
+        elements.push(
+          <div 
+            key={`section-${currentIdx}`}
+            data-section={currentIdx}
+            className={`reveal-section ${visibleSections.has(currentIdx) ? 'visible' : 'hidden'}`}
+          >
+            <div className="image-reveal">
+              <div className="image-placeholder image-2">
+                <p className="image-caption">🌸 Indizio 2: Il Fiore</p>
+                <div className="image-box">
+                  <div className="image-placeholder-content">
+                    [Inserisci qui l'immagine del fiore di ciliegio]
                   </div>
-                  <p className="image-hint">Un fiore di ciliegio...</p>
                 </div>
               </div>
-            )}
+            </div>
           </div>
         );
+        pauseDelay += 500;
+        if (currentIdx < 20) {
+          setTimeout(() => revealNextSection(currentIdx + 1), pauseDelay);
+        }
+        return;
       }
       
       if (part.match(/\[IMAGE_3\]/)) {
-        return (
-          <div key={index} data-image-id="image3" className="image-marker">
-            {visibleImages.has('image3') && (
-              <div className="reveal-image">
-                <div className="image-placeholder image-3">
-                  <p className="image-caption">🔴 La pallina rossa</p>
-                  <div className="image-box">
-                    [Qui andrà l'immagine della bandiera giapponese]
+        sectionIndex++;
+        const currentIdx = sectionIndex;
+        elements.push(
+          <div 
+            key={`section-${currentIdx}`}
+            data-section={currentIdx}
+            className={`reveal-section ${visibleSections.has(currentIdx) ? 'visible' : 'hidden'}`}
+          >
+            <div className="image-reveal">
+              <div className="image-placeholder image-3">
+                <p className="image-caption">🔴 Indizio 3: La Bandiera</p>
+                <div className="image-box">
+                  <div className="image-placeholder-content">
+                    [Inserisci qui l'immagine della pallina rossa/bandiera giapponese]
                   </div>
-                  <p className="image-hint">Il sole nascente...</p>
                 </div>
               </div>
-            )}
+            </div>
           </div>
         );
+        pauseDelay += 500;
+        if (currentIdx < 20) {
+          setTimeout(() => revealNextSection(currentIdx + 1), pauseDelay);
+        }
+        return;
       }
       
       if (part.match(/\[TICKET\]/)) {
-        return (
-          <div key={index} data-image-id="ticket" className="image-marker">
-            {visibleImages.has('ticket') && (
-              <div className="reveal-image ticket-reveal">
-                <div className="ticket-container">
-                  <div className="ticket-shine" />
-                  <h2 className="ticket-title">🎫 Il Tuo Biglietto 🎫</h2>
-                  <div className="ticket-content">
-                    <div className="ticket-destination">
-                      <span className="destination-label">Destinazione</span>
-                      <span className="destination-name">TOKYO, JAPAN 🇯🇵</span>
-                    </div>
-                    <div className="ticket-info">
-                      <p>✈️ Volo Andata e Ritorno</p>
-                      <p>🏨 Hotel prenotato</p>
-                      <p>🌸 Stagione dei ciliegi in fiore</p>
-                    </div>
-                    <div className="ticket-date">
-                      <p className="date-label">Data di partenza</p>
-                      <p className="date-value">[Controllare ultima scatola]</p>
-                    </div>
+        sectionIndex++;
+        const currentIdx = sectionIndex;
+        elements.push(
+          <div 
+            key={`section-${currentIdx}`}
+            data-section={currentIdx}
+            className={`reveal-section ${visibleSections.has(currentIdx) ? 'visible' : 'hidden'}`}
+          >
+            <div className="ticket-reveal-container">
+              <div className="ticket-container">
+                <div className="ticket-shine" />
+                <h2 className="ticket-title">✈️ Il Tuo Regalo ✈️</h2>
+                <div className="ticket-content">
+                  <div className="ticket-destination">
+                    <span className="destination-label">Destinazione</span>
+                    <span className="destination-name">GIAPPONE 🇯🇵</span>
                   </div>
-                  <div className="ticket-footer">
-                    <p>Preparati al viaggio della tua vita! 🌸✨</p>
+                  <div className="ticket-info">
+                    <p>✈️ Volo Andata e Ritorno</p>
+                    <p>🏨 Hotel Prenotato</p>
+                    <p>🌸 Primavera - Stagione dei Ciliegi in Fiore</p>
+                  </div>
+                  <div className="ticket-date">
+                    <p className="date-label">Preparati a partire</p>
+                    <p className="date-value">Primavera 2025</p>
                   </div>
                 </div>
+                <div className="ticket-footer">
+                  <p>Il viaggio che abbiamo sempre sognato 🌸✨</p>
+                </div>
               </div>
-            )}
+            </div>
           </div>
         );
+        return;
       }
       
       // Testo normale
-      return part.split('\n').map((line, lineIndex) => (
-        line.trim() ? (
-          <p key={`${index}-${lineIndex}`} className="final-text">
-            {line}
-          </p>
-        ) : (
-          <br key={`${index}-${lineIndex}`} />
-        )
-      ));
+      if (part.trim()) {
+        sectionIndex++;
+        const currentIdx = sectionIndex;
+        elements.push(
+          <div 
+            key={`section-${currentIdx}`}
+            data-section={currentIdx}
+            className={`reveal-section text-section ${visibleSections.has(currentIdx) ? 'visible' : 'hidden'}`}
+          >
+            {part.split('\n').map((line, lineIndex) => (
+              line.trim() ? (
+                <p key={`${currentIdx}-${lineIndex}`} className="final-text">
+                  {line}
+                </p>
+              ) : (
+                <br key={`${currentIdx}-${lineIndex}`} />
+              )
+            ))}
+          </div>
+        );
+        
+        // Auto-reveal dopo un breve delay per il testo
+        pauseDelay += 800;
+        if (currentIdx < 20 && !part.includes('[')) {
+          setTimeout(() => revealNextSection(currentIdx + 1), pauseDelay);
+        }
+      }
     });
+    
+    return elements;
   };
   
   return (
     <div className="final-letter-container">
       <div className="final-letter-header">
         <h1 className="final-title">{FINAL_LETTER.title}</h1>
-        <div className="sparkles">✨🌸✨</div>
+        <div className="sparkles">✨💝✨</div>
       </div>
       
       <div className="final-letter-content" ref={contentRef}>
         {renderContent()}
       </div>
       
-      <div className="final-footer">
+      <div className={`final-footer ${visibleSections.size > 15 ? 'visible' : 'hidden'}`}>
         <p className="completion-message">
           🎉 Hai completato il viaggio! 🎉
         </p>
         <p className="final-note">
-          Questo è solo l'inizio della nostra avventura insieme...
+          Questa è solo l'inizio della nostra avventura...
         </p>
       </div>
     </div>
   );
 }
-

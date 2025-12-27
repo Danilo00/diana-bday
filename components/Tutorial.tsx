@@ -99,7 +99,7 @@ export default function Tutorial({ onComplete }: TutorialProps) {
           {showHint && (
             <div className="hint-box">
               <p>💡 Il primo codice dovrebbe essere scritto sulla lettera fisica che hai trovato nella prima scatola.</p>
-              <p>Cerca qualcosa tipo: <code>INIZIO2025</code></p>
+              <p>Cerca qualcosa tipo: <code>A7Q9-M2KD</code></p>
             </div>
           )}
         </div>

@@ -183,7 +183,7 @@ export default function Home() {
                 className="final-replay-button"
                 onClick={handleReplayFinalLetter}
               >
-                Rigioca animazione
+                Riavvia la Lettera 💝
               </button>
             </div>
           )}

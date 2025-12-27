@@ -154,26 +154,31 @@ export default function FinalLetter({ onComplete, animate = true }: FinalLetterP
       if (!audioCtxRef.current) audioCtxRef.current = new AudioCtx();
       const ctx = audioCtxRef.current;
 
+      const playWithCtx = () => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const now = ctx.currentTime;
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, now);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.12, now + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.09);
+      };
+
+      // se sospeso, prova a sbloccare; poi suona
       if (ctx.state === 'suspended') {
-        ctx.resume().catch(() => {});
+        ctx.resume().then(playWithCtx).catch(() => {});
+      } else {
+        playWithCtx();
       }
-
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      const now = ctx.currentTime;
-
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(880, now);
-
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(0.12, now + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
-
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-
-      osc.start(now);
-      osc.stop(now + 0.09);
     } catch {
       // browser may block audio; ignore
     }
@@ -192,11 +197,16 @@ export default function FinalLetter({ onComplete, animate = true }: FinalLetterP
         if (!audioCtxRef.current) audioCtxRef.current = new AudioCtx();
         const ctx = audioCtxRef.current;
         // user gesture: prova a sbloccare
-        if (ctx.state === 'suspended') {
-          ctx.resume().catch(() => {});
-        }
         window.localStorage.setItem(SOUNDS_STORAGE_KEY, 'true');
         setSoundsEnabled(true);
+
+        // IMPORTANT (iOS): il beep di test deve partire nello stesso gesto utente.
+        // Facciamo resume() e poi suoniamo (senza setTimeout).
+        if (ctx.state === 'suspended') {
+          ctx.resume().then(() => playPauseBeep()).catch(() => {});
+        } else {
+          playPauseBeep();
+        }
       }
 
       const vibSupported = typeof navigator !== 'undefined' && typeof (navigator as any).vibrate === 'function';
@@ -207,11 +217,8 @@ export default function FinalLetter({ onComplete, animate = true }: FinalLetterP
         setHapticsEnabled(true);
       }
 
-      // test (beep + vibrazione)
-      setTimeout(() => {
-        playPauseBeep();
-        vibrateBeat(2000);
-      }, 50);
+      // test vibrazione (se supportata)
+      vibrateBeat(2000);
     } catch {
       // ignore
     }

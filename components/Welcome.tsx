@@ -37,9 +37,9 @@ export default function Welcome({ onStartTutorial }: WelcomeProps) {
           </p>
           
           <p>
-            Completa il gioco.<br />
-            Leggi la lettera.<br />
-            Apri la prossima scatola.
+            1. Completa il gioco.<br />
+            2. Leggi la lettera.<br />
+            3. Apri la prossima scatola.
           </p>
           
           <p className="highlight">

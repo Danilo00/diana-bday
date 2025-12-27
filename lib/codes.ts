@@ -13,10 +13,10 @@ export interface CodeMapping {
 
 // Mappatura dei codici
 export const CODES: CodeMapping[] = [
-  { code: 'A7Q9-M2KD', level: 0, type: 'tutorial' },
-  { code: 'R4T8-LX91', level: 1, type: 'letter' },
-  { code: 'C3M7-PA62', level: 2, type: 'letter' },
-  { code: 'Z9K2-WE84', level: 3, type: 'letter' },
+  { code: 'A7Q9', level: 0, type: 'tutorial' },
+  { code: 'R4T8', level: 1, type: 'letter' },
+  { code: 'C3M7', level: 2, type: 'letter' },
+  { code: 'Z9K2', level: 3, type: 'letter' },
 ];
 
 /**

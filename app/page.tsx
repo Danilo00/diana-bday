@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { debugLog } from '@/lib/debug';
 import { useAppState } from '@/hooks/useAppState';
 import Welcome from '@/components/Welcome';
@@ -9,6 +9,8 @@ import CodeInput from '@/components/CodeInput';
 import LettersHistory from '@/components/LettersHistory';
 import FinalLetter from '@/components/FinalLetter';
 import ScrollToBottomFab from '@/components/ScrollToBottomFab';
+import ResetAppDialog from '@/components/ResetAppDialog';
+import { resetAllAppStorage } from '@/lib/storage';
 
 export default function Home() {
   const {
@@ -28,6 +30,8 @@ export default function Home() {
   const [showFinalLetter, setShowFinalLetter] = useState(false);
   const [finalLetterRunId, setFinalLetterRunId] = useState(0);
   const [forceReplayAnimation, setForceReplayAnimation] = useState(false);
+  const [showResetDialog, setShowResetDialog] = useState(false);
+  const resetHoldTimerRef = useRef<number | null>(null);
   
   debugLog.debug('Home page rendered', { state, isLoaded });
 
@@ -114,6 +118,21 @@ export default function Home() {
       const el = document.querySelector('.final-section');
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 50);
+  };
+
+  const startFooterHold = () => {
+    if (resetHoldTimerRef.current) window.clearTimeout(resetHoldTimerRef.current);
+    resetHoldTimerRef.current = window.setTimeout(() => {
+      debugLog.info('Footer long-press: open reset dialog');
+      setShowResetDialog(true);
+    }, 5000);
+  };
+
+  const cancelFooterHold = () => {
+    if (resetHoldTimerRef.current) {
+      window.clearTimeout(resetHoldTimerRef.current);
+      resetHoldTimerRef.current = null;
+    }
   };
   
   // Loading state
@@ -237,7 +256,18 @@ export default function Home() {
       
       {/* Footer */}
       <footer className="app-footer">
-        <p>Fatto con il ❤️ da Danilo per i 22 anni di Diana</p>
+        <button
+          type="button"
+          className="app-footer-hold"
+          onPointerDown={startFooterHold}
+          onPointerUp={cancelFooterHold}
+          onPointerCancel={cancelFooterHold}
+          onPointerLeave={cancelFooterHold}
+          onContextMenu={(e) => e.preventDefault()}
+          aria-label="Tieni premuto 5 secondi per reset"
+        >
+          Fatto con il ❤️ da Danilo per i 22 anni di Diana
+        </button>
         {process.env.NODE_ENV === 'development' && (
           <button 
             onClick={() => {
@@ -255,6 +285,16 @@ export default function Home() {
       </footer>
 
       <ScrollToBottomFab />
+
+      <ResetAppDialog
+        open={showResetDialog}
+        onClose={() => setShowResetDialog(false)}
+        onConfirm={() => {
+          resetAllAppStorage();
+          // ricarica per tornare allo stato iniziale (welcome/tutorial)
+          window.location.reload();
+        }}
+      />
     </main>
   );
 }

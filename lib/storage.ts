@@ -12,6 +12,11 @@ export interface AppState {
 }
 
 const STORAGE_KEY = 'diana-bday-state';
+export const APP_STORAGE_KEYS = [
+  STORAGE_KEY,
+  'diana-bday-sounds-enabled',
+  'diana-bday-haptics-enabled',
+] as const;
 
 const DEFAULT_STATE: AppState = {
   tutorialCompleted: false,
@@ -124,5 +129,17 @@ export function resetState(): void {
   
   localStorage.removeItem(STORAGE_KEY);
   debugLog.info('State reset');
+}
+
+/**
+ * Reset completo dell'app (stato + preferenze)
+ * Non usa localStorage.clear() per evitare di toccare chiavi non legate all'app.
+ */
+export function resetAllAppStorage(): void {
+  if (typeof window === 'undefined') return;
+  for (const k of APP_STORAGE_KEYS) {
+    localStorage.removeItem(k);
+  }
+  debugLog.info('All app storage reset', { keys: APP_STORAGE_KEYS });
 }
 

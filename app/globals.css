@@ -895,6 +895,20 @@ body {
   font-size: 0.9rem;
 }
 
+.app-footer-hold {
+  display: inline-block;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: default;
+  padding: 0;
+}
+
+.app-footer-hold:active {
+  opacity: 0.7;
+}
+
 .debug-button {
   margin-top: 1rem;
   padding: 0.5rem 1rem;
@@ -939,6 +953,71 @@ body {
 
 .scroll-bottom-fab.visible {
   opacity: 1;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 2000;
+}
+
+.modal-panel {
+  width: min(560px, 100%);
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 18px;
+  padding: 1.25rem 1.25rem 1rem;
+  box-shadow: 0 30px 90px rgba(0,0,0,0.35);
+}
+
+.modal-title {
+  font-size: 1.25rem;
+  color: var(--color-text);
+  margin-bottom: 0.75rem;
+}
+
+.modal-text {
+  color: var(--color-text);
+  line-height: 1.6;
+  margin-bottom: 0.75rem;
+}
+
+.modal-text.subtle {
+  color: var(--color-text-light);
+  font-size: 0.95rem;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.modal-btn {
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.modal-btn.secondary {
+  background: white;
+  color: var(--color-text);
+}
+
+.modal-btn.danger {
+  background: var(--color-error);
+  border-color: var(--color-error);
+  color: white;
 }
 
 /* Final Unlock Section */

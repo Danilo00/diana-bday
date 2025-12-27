@@ -27,6 +27,23 @@ export default function Home() {
   const [showFinalLetter, setShowFinalLetter] = useState(false);
   
   debugLog.debug('Home page rendered', { state, isLoaded });
+
+  // Quando si sblocca una nuova lettera, scorri fino al messaggio appena sbloccato
+  useEffect(() => {
+    if (!isLoaded) return;
+    if (showTutorial || showWelcome || showFinalLetter) return;
+    if (latestUnlockedLevel === undefined || latestUnlockedLevel === null) return;
+
+    // aspetta il render del DOM
+    const t = window.setTimeout(() => {
+      const el = document.getElementById(`letter-level-${latestUnlockedLevel}`);
+      if (!el) return;
+      debugLog.info('Scrolling to latest unlocked letter', { latestUnlockedLevel });
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+
+    return () => window.clearTimeout(t);
+  }, [isLoaded, latestUnlockedLevel, showFinalLetter, showTutorial, showWelcome]);
   
   // Gestisce il primo caricamento
   useEffect(() => {
@@ -64,12 +81,8 @@ export default function Home() {
     
     if (success) {
       setShowSuccess(true);
-      setLatestUnlockedLevel(state.currentLevel);
-      
-      // Scroll verso l'alto per vedere la nuova lettera
-      setTimeout(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }, 100);
+      // Il nuovo livello sbloccato è quello successivo a quello corrente
+      setLatestUnlockedLevel(state.currentLevel + 1);
       
       setTimeout(() => setShowSuccess(false), 3000);
     }

@@ -54,7 +54,7 @@ export default function CodeInput({ onCodeSubmit, currentLevel, disabled = false
         </h3>
         
         <p className="code-input-description">
-          Trova la lettera fisica nella prossima scatola e inserisci il codice qui sotto.
+          Trova la lettera nella prossima scatola e inserisci il codice qui sotto.
         </p>
         
         <form onSubmit={handleSubmit} className="code-form">

@@ -1,65 +1,177 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect } from 'react';
+import { debugLog } from '@/lib/debug';
+import { useAppState } from '@/hooks/useAppState';
+import Welcome from '@/components/Welcome';
+import Tutorial from '@/components/Tutorial';
+import CodeInput from '@/components/CodeInput';
+import LettersHistory from '@/components/LettersHistory';
+import FinalLetter from '@/components/FinalLetter';
 
 export default function Home() {
+  const {
+    state,
+    isLoaded,
+    error,
+    handleCompleteTutorial,
+    handleCodeSubmit,
+    getUnlockedLetters,
+    isFinalLetterUnlocked,
+  } = useAppState();
+  
+  const [showWelcome, setShowWelcome] = useState(true);
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [latestUnlockedLevel, setLatestUnlockedLevel] = useState<number | undefined>();
+  
+  debugLog.debug('Home page rendered', { state, isLoaded });
+  
+  // Gestisce il primo caricamento
+  useEffect(() => {
+    if (isLoaded) {
+      if (state.tutorialCompleted) {
+        setShowWelcome(false);
+        setShowTutorial(false);
+      }
+    }
+  }, [isLoaded, state.tutorialCompleted]);
+  
+  // Handlers
+  const handleStartTutorial = () => {
+    debugLog.info('Starting tutorial');
+    setShowWelcome(false);
+    setShowTutorial(true);
+  };
+  
+  const handleTutorialComplete = (code: string) => {
+    debugLog.info('Tutorial code submitted', code);
+    const success = handleCodeSubmit(code);
+    
+    if (success) {
+      handleCompleteTutorial();
+      setShowTutorial(false);
+      setShowSuccess(true);
+      setLatestUnlockedLevel(0);
+      
+      setTimeout(() => setShowSuccess(false), 3000);
+    }
+  };
+  
+  const handleNewCodeSubmit = (code: string) => {
+    const success = handleCodeSubmit(code);
+    
+    if (success) {
+      setShowSuccess(true);
+      setLatestUnlockedLevel(state.currentLevel);
+      
+      // Scroll verso l'alto per vedere la nuova lettera
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 100);
+      
+      setTimeout(() => setShowSuccess(false), 3000);
+    }
+  };
+  
+  // Loading state
+  if (!isLoaded) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner">🎁</div>
+        <p>Caricamento...</p>
+      </div>
+    );
+  }
+  
+  // Welcome screen
+  if (showWelcome) {
+    return <Welcome onStartTutorial={handleStartTutorial} />;
+  }
+  
+  // Tutorial screen
+  if (showTutorial) {
+    return <Tutorial onComplete={handleTutorialComplete} />;
+  }
+  
+  // Main app
+  const unlockedLetters = getUnlockedLetters();
+  const finalUnlocked = isFinalLetterUnlocked();
+  
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <main className="main-container">
+      {/* Success notification */}
+      {showSuccess && (
+        <div className="success-notification">
+          <div className="success-content">
+            <span className="success-icon">✨</span>
+            <span className="success-text">Nuovo messaggio sbloccato!</span>
+            <span className="success-icon">✨</span>
+          </div>
+        </div>
+      )}
+      
+      {/* Error notification */}
+      {error && (
+        <div className="error-notification">
+          <div className="error-content">
+            <span className="error-icon">❌</span>
+            <span className="error-text">{error}</span>
+          </div>
+        </div>
+      )}
+      
+      {/* Header */}
+      <header className="app-header">
+        <h1 className="app-title">🎁 Lettere per Diana 🎁</h1>
+        <p className="app-subtitle">
+          Livello {state.currentLevel >= 0 ? state.currentLevel + 1 : 1} di 5
+        </p>
+      </header>
+      
+      {/* Final Letter (se sbloccata) */}
+      {finalUnlocked && (
+        <div className="final-section">
+          <FinalLetter />
+        </div>
+      )}
+      
+      {/* Letters History */}
+      {unlockedLetters.length > 0 && !finalUnlocked && (
+        <LettersHistory 
+          letters={unlockedLetters} 
+          latestLevel={latestUnlockedLevel}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+      )}
+      
+      {/* Code Input (solo se non è stata sbloccata la lettera finale) */}
+      {!finalUnlocked && (
+        <div className="input-section">
+          <CodeInput 
+            onCodeSubmit={handleNewCodeSubmit}
+            currentLevel={state.currentLevel}
+          />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+      )}
+      
+      {/* Footer */}
+      <footer className="app-footer">
+        <p>Made with ❤️ for Diana's Birthday</p>
+        {process.env.NODE_ENV === 'development' && (
+          <button 
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                (window as any).DEBUG_ENABLE = true;
+                debugLog.info('Debug mode enabled from UI');
+                alert('Debug mode enabled! Check console.');
+              }
+            }}
+            className="debug-button"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+            Enable Debug
+          </button>
+        )}
+      </footer>
+    </main>
   );
 }

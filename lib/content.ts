@@ -90,11 +90,11 @@ E alla fine ho capito una cosa.
 
 Non dovevo superarlo.
 
-[PAUSE]
+[PAUSE_BEAT]
 
 Potevo uguagliarlo.
 
-[PAUSE]
+[PAUSE_BEAT]
 
 E per farlo, ho provato a raccontartelo senza dirtelo...
 

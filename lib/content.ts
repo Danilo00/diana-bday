@@ -108,8 +108,8 @@ E per farlo, ho provato a raccontartelo senza dirtelo...
 
 Nel primo gioco c'era un aereo.
 
-Perché quello che faremo
-è partire.
+Perché quello che faremo è...
+partire.
 
 [PAUSE]
 
@@ -120,7 +120,8 @@ Perché quello che faremo
 Nel secondo c'era un fiore.
 
 Perché il momento giusto
-è quando tutto fiorisce, la primavera.
+è quando tutto fiorisce...
+la primavera.
 
 [PAUSE]
 
@@ -130,7 +131,8 @@ Perché il momento giusto
 
 Nell'ultimo c'era una pallina rossa, su uno sfondo bianco.
 
-Una bandiera, la nostra destinazione.
+Una bandiera... 
+la nostra destinazione.
 
 [PAUSE_FINAL]
 

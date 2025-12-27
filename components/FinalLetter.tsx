@@ -291,10 +291,9 @@ export default function FinalLetter({ onComplete }: FinalLetterProps) {
                 src="/Biglietto.PNG"
                 alt="Biglietto per il Giappone"
                 title="Biglietto - zoom"
-                triggerLabel="Apri biglietto (zoom)"
+                triggerLabel="Visualizza biglietto"
                 className="ticket-lightbox"
-              />
-              <div className="ticket-hint">Puoi zoomare e scaricarlo. (ESC per chiudere)</div>
+              />              
             </div>
           </div>
         </div>

@@ -27,8 +27,8 @@ export default function Welcome({ onStartTutorial }: WelcomeProps) {
         
         <div className="welcome-text">          
           <p>
-            Hai davanti a te una serie di scatole.🎁<br />
-            Ogni scatola contiene un mini-gioco ed una lettera.✉️
+            Hai davanti a te una serie di scatole🎁<br />
+            Ogni scatola contiene un mini-gioco ed una lettera✉️
           </p>
           
           <p>

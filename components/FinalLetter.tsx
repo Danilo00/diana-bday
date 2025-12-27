@@ -25,9 +25,9 @@ function buildFinalSteps(content: string): FinalStep[] {
   );
 
   const steps: FinalStep[] = [];
-  const PAUSE_SHORT = 2000;
-  const PAUSE_LONG = 3500;
-  const PAUSE_FINAL = 4000;
+  const PAUSE_SHORT = 6000;
+  const PAUSE_LONG = 10000;
+  const PAUSE_FINAL = 15000;
 
   const addDelayToPrev = (ms: number) => {
     if (steps.length === 0) return;
@@ -167,9 +167,19 @@ export default function FinalLetter({ onComplete }: FinalLetterProps) {
             <div className="image-placeholder image-1">
               <p className="image-caption">✈️ Indizio 1: L'Aereo</p>
               <div className="image-box">
-                <div className="image-placeholder-content">
-                  [Inserisci qui l'immagine del gioco delle differenze con l'aereo]
-                </div>
+                <img
+                  src="/Indizio1.png"
+                  alt="Indizio 1 - Aereo"
+                  draggable={false}
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    borderRadius: '12px',
+                    userSelect: 'none',
+                    pointerEvents: 'none',
+                    display: 'block',
+                  }}
+                />
               </div>
             </div>
           </div>
@@ -188,7 +198,19 @@ export default function FinalLetter({ onComplete }: FinalLetterProps) {
             <div className="image-placeholder image-2">
               <p className="image-caption">🌸 Indizio 2: Il Fiore</p>
               <div className="image-box">
-                <div className="image-placeholder-content">[Inserisci qui l'immagine del fiore di ciliegio]</div>
+                <img
+                  src="/Indizio2.png"
+                  alt="Indizio 2 - Fiore"
+                  draggable={false}
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    borderRadius: '12px',
+                    userSelect: 'none',
+                    pointerEvents: 'none',
+                    display: 'block',
+                  }}
+                />
               </div>
             </div>
           </div>
@@ -207,9 +229,19 @@ export default function FinalLetter({ onComplete }: FinalLetterProps) {
             <div className="image-placeholder image-3">
               <p className="image-caption">🔴 Indizio 3: La Bandiera</p>
               <div className="image-box">
-                <div className="image-placeholder-content">
-                  [Inserisci qui l'immagine della pallina rossa/bandiera giapponese]
-                </div>
+                <img
+                  src="/Indizio3.png"
+                  alt="Indizio 3 - Bandiera"
+                  draggable={false}
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    borderRadius: '12px',
+                    userSelect: 'none',
+                    pointerEvents: 'none',
+                    display: 'block',
+                  }}
+                />
               </div>
             </div>
           </div>
@@ -229,22 +261,20 @@ export default function FinalLetter({ onComplete }: FinalLetterProps) {
             <div className="ticket-shine" />
             <h2 className="ticket-title">✈️ Il Tuo Regalo ✈️</h2>
             <div className="ticket-content">
-              <div className="ticket-destination">
-                <span className="destination-label">Destinazione</span>
-                <span className="destination-name">GIAPPONE 🇯🇵</span>
-              </div>
-              <div className="ticket-info">
-                <p>✈️ Volo Andata e Ritorno</p>
-                <p>🏨 Hotel Prenotato</p>
-                <p>🌸 Primavera - Stagione dei Ciliegi in Fiore</p>
-              </div>
-              <div className="ticket-date">
-                <p className="date-label">Preparati a partire</p>
-                <p className="date-value">Primavera 2025</p>
-              </div>
-            </div>
-            <div className="ticket-footer">
-              <p>Il viaggio che abbiamo sempre sognato 🌸✨</p>
+              <img
+                src="/Biglietto.PNG"
+                alt="Biglietto per il Giappone"
+                draggable={false}
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                  borderRadius: '12px',
+                  userSelect: 'none',
+                  pointerEvents: 'none',
+                  display: 'block',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
+                }}
+              />
             </div>
           </div>
         </div>

@@ -25,7 +25,7 @@ Ti aspetta il primo mini-gioco: trova gli intrusi!`,
     content: `Ok.
 
 Il primo gioco era molto semplice, serviva a rompere il ghiaccio.
-Il prossimo mini-gioco ti farà perdere più tempo, armati di pazienza.
+Il prossimo mini-gioco ti farà perdere più tempo, armati di pazienza e trova l'unico foglietto che si differenzia dagli altri.
 
 Per ora non serve capire nulla.
 
@@ -43,7 +43,8 @@ e continui ad andare avanti.
 
 Hai sbloccato il secondo pezzo.
 
-C'è ancora un ultimo gioco, tranquilla è più semplice del secondo.`,
+C'è ancora un ultimo gioco, tranquilla è più semplice del secondo.
+Trova anche qui colei che si differenzia dalle altre e posizionala al centro.`,
     date: 'Livello 2'
   },
   {
